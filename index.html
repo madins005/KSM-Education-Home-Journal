@@ -11,6 +11,54 @@
     <link rel="stylesheet" href="./styles/admin.css" />
     <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
     <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+      /* Additional styles for dual login buttons */
+      .auth-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn-user-login,
+      .btn-register {
+        padding: 8px 16px;
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .btn-user-login:hover,
+      .btn-register:hover {
+        background: #555;
+        transform: translateY(-1px);
+      }
+
+      /* Responsive untuk mobile */
+      @media (max-width: 768px) {
+        .auth-section {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .btn-user-login,
+        .btn-register {
+          width: 100%;
+          text-align: center;
+        }
+
+        .search-box {
+          width: 100%;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- Header -->
@@ -18,7 +66,7 @@
       <div class="header-container">
         <div class="logo">
           <a href="#"><img src="./assets/main_logo.png" alt="Logo" /></a>
-          <!-- <span class="logo-text"><a href="#">KSM EDUCATION</a></span> -->
+          <span class="logo-text">KSM EDUCATION</span>
         </div>
         <nav class="active">
           <a href="#">HOME</a>
@@ -26,7 +74,8 @@
           <a href="#upload">UPLOAD</a>
         </nav>
         <div class="auth-section">
-          <a href="#" class="btn-register">LOGIN</a>
+          <a href="./login_user.html" class="btn-user-login">User Login</a>
+          <a href="#" class="btn-register">Admin Login</a>
           <div class="search-box">
             <i id="icon-search" data-feather="search"></i>
             <input type="text" placeholder="cari jurnal..." />
@@ -238,7 +287,7 @@
       </section>
     </div>
 
-    <!-- Login Modal -->
+    <!-- Login Modal (Admin) -->
     <div id="loginModal" class="modal">
       <div class="modal-overlay"></div>
       <div class="modal-content login-container">
@@ -252,7 +301,8 @@
             alt="KSM Education Logo"
             class="login-logo"
           />
-          <h2>SELAMAT DATANG !</h2>
+          <h2>ADMIN LOGIN</h2>
+          <p style="color: #666; font-size: 14px; margin-top: 8px;">Login sebagai Administrator</p>
         </div>
 
         <form id="loginForm" class="login-form">
@@ -260,7 +310,7 @@
             <input
               type="email"
               id="loginEmail"
-              placeholder="Masukan Email"
+              placeholder="Masukan Email Admin"
               required
             />
           </div>
@@ -273,22 +323,7 @@
               required
             />
             <button type="button" class="toggle-password" id="togglePassword">
-              <i id="eyeIcon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </i>
+              <i data-feather="eye"></i>
             </button>
           </div>
 
@@ -297,17 +332,11 @@
               <input type="checkbox" id="rememberMe" />
               <span>Remember Me</span>
             </label>
-            <a href="https://wa.me/085712187669" class="forgot-password">Forgot Password?</a>
+            <a href="#" class="forgot-password">Forgot Password?</a>
           </div>
 
           <button type="submit" class="btn-login">MASUK</button>
         </form>
-
-        <!-- <div class="login-footer">
-          <p>Default Admin Login:</p>
-          <p><strong>Email:</strong> admin@ksmeducation.com</p>
-          <p><strong>Password:</strong> admin123</p>
-        </div> -->
       </div>
     </div>
 

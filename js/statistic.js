@@ -1,193 +1,115 @@
-// ===== REAL-TIME STATISTICS SYSTEM =====
+// statistic.js - Script untuk sinkronisasi statistik antara admin dan user
 
-class StatisticsManager {
-  constructor() {
-    this.articleCountElement = document.getElementById("articleCount");
-    this.visitorCountElement = document.getElementById("visitorCount");
-    this.isAnimating = false;
+// Fungsi untuk menghitung total pengunjung dari semua jurnal
+function calculateTotalVisitors() {
+  const journals = JSON.parse(localStorage.getItem('journals') || '[]');
+  let totalVisitors = 0;
+  
+  journals.forEach(journal => {
+    totalVisitors += parseInt(journal.views || 0);
+  });
+  
+  // Update visitorCount di localStorage
+  localStorage.setItem('visitorCount', totalVisitors.toString());
+  
+  return totalVisitors;
+}
 
-    // Initialize statistics
-    this.init();
+// Fungsi untuk mendapatkan jumlah artikel
+function getArticleCount() {
+  const journals = JSON.parse(localStorage.getItem('journals') || '[]');
+  return journals.length;
+}
+
+// Fungsi untuk update statistik (digunakan di dashboard admin dan user)
+function updateStatistics() {
+  const articleCount = getArticleCount();
+  const visitorCount = calculateTotalVisitors();
+  
+  // Update DOM elements jika ada
+  const articleCountEl = document.getElementById('articleCount');
+  const visitorCountEl = document.getElementById('visitorCount');
+  
+  if (articleCountEl) {
+    animateCount(articleCountEl, articleCount);
   }
-
-  init() {
-    // Load statistics from localStorage
-    this.loadStatistics();
-
-    // Track visitor
-    this.trackVisitor();
-
-    // Update article count based on journals
-    this.updateArticleCount();
-
-    // Start real-time counter animation
-    this.startCounterAnimation();
-
-    // Set up periodic updates
-    this.setupPeriodicUpdates();
+  
+  if (visitorCountEl) {
+    animateCount(visitorCountEl, visitorCount);
   }
+  
+  return { articleCount, visitorCount };
+}
 
-  loadStatistics() {
-    // Get stored statistics or initialize
-    const stats = this.getStoredStats();
-    this.currentArticles = stats.articles;
-    this.currentVisitors = stats.visitors;
-  }
-
-  getStoredStats() {
-    const stored = localStorage.getItem("siteStatistics");
-    if (stored) {
-      return JSON.parse(stored);
+// Animasi counter
+function animateCount(element, target) {
+  const current = parseInt(element.textContent) || 0;
+  const increment = Math.ceil(Math.abs(target - current) / 30);
+  
+  if (current === target) return;
+  
+  const timer = setInterval(() => {
+    const currentValue = parseInt(element.textContent) || 0;
+    
+    if (currentValue < target) {
+      const newValue = Math.min(currentValue + increment, target);
+      element.textContent = newValue;
+      element.classList.add('counting');
+    } else if (currentValue > target) {
+      const newValue = Math.max(currentValue - increment, target);
+      element.textContent = newValue;
+      element.classList.add('counting');
+    } else {
+      element.classList.remove('counting');
+      clearInterval(timer);
     }
+  }, 20);
+}
 
-    // Initialize new statistics
-    return {
-      articles: 0,
-      visitors: 0,
-      lastVisit: null,
-      uniqueVisitorId: this.generateVisitorId(),
-    };
+// Fungsi untuk increment views saat jurnal dibuka
+function incrementJournalView(journalId) {
+  const journals = JSON.parse(localStorage.getItem('journals') || '[]');
+  
+  const journalIndex = journals.findIndex(j => j.id === journalId);
+  
+  if (journalIndex !== -1) {
+    journals[journalIndex].views = (parseInt(journals[journalIndex].views) || 0) + 1;
+    localStorage.setItem('journals', JSON.stringify(journals));
+    
+    // Update visitor count
+    calculateTotalVisitors();
+    
+    return journals[journalIndex].views;
   }
+  
+  return 0;
+}
 
-  saveStatistics() {
-    const stats = {
-      articles: this.currentArticles,
-      visitors: this.currentVisitors,
-      lastVisit: new Date().toISOString(),
-      uniqueVisitorId: this.getStoredStats().uniqueVisitorId,
-    };
-    localStorage.setItem("siteStatistics", JSON.stringify(stats));
-  }
+// Auto-refresh statistics setiap 3 detik
+function startStatisticsAutoRefresh() {
+  setInterval(() => {
+    updateStatistics();
+  }, 3000);
+}
 
-  generateVisitorId() {
-    return (
-      "visitor_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9)
-    );
-  }
+// Initialize saat halaman load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    updateStatistics();
+    startStatisticsAutoRefresh();
+  });
+} else {
+  updateStatistics();
+  startStatisticsAutoRefresh();
+}
 
-  trackVisitor() {
-    const stats = this.getStoredStats();
-    const today = new Date().toDateString();
-    const lastVisit = stats.lastVisit
-      ? new Date(stats.lastVisit).toDateString()
-      : null;
-
-    // Increment visitor count if it's a new day or first visit
-    if (!lastVisit || lastVisit !== today) {
-      this.currentVisitors++;
-      this.saveStatistics();
-    }
-
-    // Track session visitors (for demo purposes)
-    const sessionVisitors = sessionStorage.getItem("sessionVisitorCount");
-    if (!sessionVisitors) {
-      sessionStorage.setItem("sessionVisitorCount", "1");
-    }
-  }
-
-  updateArticleCount() {
-    // Count articles from journal list
-    const articles = document.querySelectorAll(".journal-item");
-    this.currentArticles = articles.length;
-    this.saveStatistics();
-  }
-
-  startCounterAnimation() {
-    // Animate from 0 to current value
-    this.animateCounter(
-      this.articleCountElement,
-      0,
-      this.currentArticles,
-      1500
-    );
-    this.animateCounter(
-      this.visitorCountElement,
-      0,
-      this.currentVisitors,
-      2000
-    );
-  }
-
-  animateCounter(element, start, end, duration) {
-    if (this.isAnimating) return;
-
-    element.classList.add("counting");
-    const startTime = performance.now();
-    const range = end - start;
-
-    const updateCounter = (currentTime) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Easing function for smooth animation
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      const current = Math.floor(start + range * easeOutQuart);
-
-      element.textContent = current;
-
-      if (progress < 1) {
-        requestAnimationFrame(updateCounter);
-      } else {
-        element.textContent = end;
-        element.classList.remove("counting");
-      }
-    };
-
-    requestAnimationFrame(updateCounter);
-  }
-
-  incrementArticleCount() {
-    this.currentArticles++;
-    this.saveStatistics();
-    this.animateCounter(
-      this.articleCountElement,
-      parseInt(this.articleCountElement.textContent),
-      this.currentArticles,
-      500
-    );
-  }
-
-  decrementArticleCount() {
-    if (this.currentArticles > 0) {
-      this.currentArticles--;
-      this.saveStatistics();
-      this.animateCounter(
-        this.articleCountElement,
-        parseInt(this.articleCountElement.textContent),
-        this.currentArticles,
-        500
-      );
-    }
-  }
-
-  incrementVisitorCount() {
-    this.currentVisitors++;
-    this.saveStatistics();
-    this.animateCounter(
-      this.visitorCountElement,
-      parseInt(this.visitorCountElement.textContent),
-      this.currentVisitors,
-      500
-    );
-  }
-
-  setupPeriodicUpdates() {
-    // Simulate real-time visitor updates (for demo)
-    setInterval(() => {
-      // Random chance to simulate a new visitor (5% chance every 10 seconds)
-      if (Math.random() < 0.05) {
-        this.incrementVisitorCount();
-      }
-    }, 10000);
-  }
-
-  resetStatistics() {
-    localStorage.removeItem("siteStatistics");
-    sessionStorage.removeItem("sessionVisitorCount");
-    this.currentArticles = 0;
-    this.currentVisitors = 0;
-    this.saveStatistics();
-    this.articleCountElement.textContent = "0";
-    this.visitorCountElement.textContent = "0";
-  }
+// Export functions untuk digunakan di file lain
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    calculateTotalVisitors,
+    getArticleCount,
+    updateStatistics,
+    incrementJournalView,
+    startStatisticsAutoRefresh
+  };
 }
