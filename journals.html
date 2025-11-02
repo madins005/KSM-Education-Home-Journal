@@ -20,7 +20,7 @@
           <a href="index.html"
             ><img src="./assets/main_logo.png" alt="Logo"
           /></a>
-          <span class="logo-text">KSM EDUCATION</span>
+          <!-- <span class="logo-text">KSM EDUCATION</span> -->
         </div>
         <nav class="active">
           <a href="index.html">HOME</a>
@@ -29,10 +29,10 @@
         </nav>
         <div class="auth-section">
           <a href="#" class="btn-register">LOGIN</a>
-          <div class="search-box">
+          <!-- <div class="search-box">
             <i id="icon-search" data-feather="search"></i>
             <input type="text" placeholder="cari jurnal..." />
-          </div>
+          </div> -->
         </div>
       </div>
     </header>
@@ -56,6 +56,10 @@
             <option value="oldest">Terlama</option>
             <option value="title">Judul (A-Z)</option>
           </select>
+          <div class="search-box">
+            <i id="icon-search" data-feather="search"></i>
+            <input type="text" placeholder="cari jurnal..." />
+          </div>
         </div>
         <div class="filter-stats"><span id="totalJournals">0</span> jurnal</div>
       </section>
@@ -176,7 +180,22 @@
               required
             />
             <button type="button" class="toggle-password" id="togglePassword">
-              <i data-feather="eye"></i>
+              <i id="eyeIcon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </i>
             </button>
           </div>
 

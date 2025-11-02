@@ -141,30 +141,67 @@
 }
 
 /* Password Group */
+.form-group {
+  margin-bottom: 20px;
+}
+
 .password-group {
   position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.password-group input {
+  flex: 1;
+  padding: 12px 45px 12px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
+  transition: border-color 0.3s ease;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.password-group input:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 8px rgba(33, 150, 243, 0.2);
 }
 
 .toggle-password {
   position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 10px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px;
-  transition: all 0.3s ease;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  transition: color 0.3s ease;
 }
 
 .toggle-password:hover {
-  transform: translateY(-50%) scale(1.1);
+  color: #2196f3;
 }
 
-.toggle-password i {
+#eyeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 20px;
   height: 20px;
-  color: #666;
+}
+
+#eyeIcon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
 }
 
 /* Form Options */
