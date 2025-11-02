@@ -25,7 +25,7 @@
 
 .stat-card {
   background-color: white;
-  padding: 40px;    
+  padding: 40px;
   border-radius: 10px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
   text-align: center;
@@ -547,8 +547,8 @@
   color: white;
   border: none;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 26px;
+  height: 26px;
   cursor: pointer;
   display: flex;
   align-items: center;

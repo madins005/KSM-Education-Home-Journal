@@ -165,6 +165,18 @@ class AuthorsManager {
 // ===== INITIALIZE ALL SYSTEMS =====
 
 document.addEventListener("DOMContentLoaded", () => {
+  window.loginManager = new LoginManager();
+
+  // Initialize pagination jika di halaman journals
+  if (document.getElementById("journalFullContainer")) {
+    // Initialize EditJournalManager untuk journals page
+    window.editJournalManager = new EditJournalManager();
+
+    window.paginationManager = new PaginationManager();
+    console.log("Journals page systems initialized");
+    return;
+  }
+
   // Initialize managers
   window.statsManager = new StatisticsManager();
   window.journalManager = new JournalManager();
@@ -172,23 +184,30 @@ document.addEventListener("DOMContentLoaded", () => {
   window.coverUploadManager = new CoverUploadManager();
   window.fileUploadManager = new FileUploadManager();
   window.authorsManager = new AuthorsManager();
-  window.loginManager = new LoginManager(); // NEW
+  window.editJournalManager = new EditJournalManager();
   window.formHandler = new FormHandler();
 
-  // Update article count after journals are loaded
-  setTimeout(() => {
-    window.statsManager.updateArticleCount();
-    window.statsManager.startCounterAnimation();
-  }, 100);
+  // Sync login status
+  if (window.loginManager) {
+    window.loginManager.syncLoginStatus();
+  }
+
+  // Update article count
+  if (window.statsManager) {
+    setTimeout(() => {
+      window.statsManager.updateArticleCount();
+      window.statsManager.startCounterAnimation();
+    }, 100);
+  }
 
   // Debug console
-  console.log("📊 Statistics System Initialized");
-  console.log("📁 File Upload System Initialized");
-  console.log("🖼️ Cover Upload System Initialized");
-  console.log("👥 Authors System Initialized");
-  console.log("🔐 Login System Initialized"); // NEW
-  console.log("💾 Download System Initialized");
-  console.log("\n🔑 Default Admin Login:");
-  console.log("   Email: admin@ksmeducation.com");
-  console.log("   Password: admin123");
+  console.log("Statistics System Initialized");
+  console.log("File Upload System Initialized");
+  console.log("Cover Upload System Initialized");
+  console.log("Authors System Initialized");
+  console.log("Login System Initialized");
+  console.log("Edit Journal System Initialized");
+  console.log("Download System Initialized");
+  console.log("Pagination System Initialized");
+  console.log("\nDefault Admin Login:");
 });

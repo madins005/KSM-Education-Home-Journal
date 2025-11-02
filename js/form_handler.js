@@ -20,20 +20,17 @@ class FormHandler {
       return;
     }
 
-    // Check if cover is uploaded
     if (!window.coverUploadManager.getUploadedCover()) {
       if (!confirm("Belum upload cover jurnal. Lanjutkan tanpa cover?")) {
         return;
       }
     }
 
-    // Check if file is uploaded
     if (!window.fileUploadManager.getUploadedFile()) {
       alert("Silakan upload file jurnal (PDF/Word) terlebih dahulu!");
       return;
     }
 
-    // Get authors
     const authors = window.authorsManager.getAuthors();
 
     if (authors.length === 0) {
@@ -41,20 +38,37 @@ class FormHandler {
       return;
     }
 
+    // JANGAN simpan file data kalau file terlalu besar
+    let fileData = null;
+    const file = window.fileUploadManager.getUploadedFile();
+
+    if (file.size > 2 * 1024 * 1024) {
+      // > 2MB
+      const proceed = confirm(
+        "File terlalu besar (" +
+          Math.round(file.size / 1024 / 1024) +
+          "MB). " +
+          "File tidak akan disimpan untuk download.\n\n" +
+          "Lanjutkan?"
+      );
+      if (!proceed) return;
+      fileData = null;
+    } else {
+      fileData = await window.fileUploadManager.getFileDataURL();
+    }
+
     const formData = {
       judulJurnal: document.getElementById("judulJurnal").value,
-      namaPenulis: authors, // Array of authors
+      namaPenulis: authors,
       email: document.getElementById("email").value,
       kontak: document.getElementById("kontak").value,
       abstrak: document.getElementById("abstrak").value,
-      fileName: window.fileUploadManager.getUploadedFile().name,
+      fileName: file.name,
       coverImage: window.coverUploadManager.getCoverDataURL(),
-      fileData: await window.fileUploadManager.getFileDataURL(),
+      fileData: fileData,
     };
 
-    // Simulate upload with progress bar
     window.fileUploadManager.simulateUpload(async () => {
-      // Add journal to list
       if (window.journalManager) {
         await window.journalManager.addJournal(formData);
       }
@@ -76,7 +90,6 @@ class FormHandler {
           formData.fileName
       );
 
-      // Reset form and files
       this.form.reset();
       window.fileUploadManager.removeFile();
       window.coverUploadManager.removeCover();
