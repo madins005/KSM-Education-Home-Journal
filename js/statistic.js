@@ -11,20 +11,29 @@ class StatisticsManager {
   }
 
   init() {
-    // Load statistics from localStorage
-    this.loadStatistics();
+    if (!this.articleCountElement && !this.visitorCountElement) return;
 
-    // Track visitor
+    this.loadStatistics();
     this.trackVisitor();
 
-    // Update article count based on journals
+    // Hitung dari localStorage (bukan dari DOM)
     this.updateArticleCount();
 
-    // Start real-time counter animation
+    // Animasi awal (opsional)
     this.startCounterAnimation();
 
-    // Set up periodic updates
+    // Periodic (opsional)
     this.setupPeriodicUpdates();
+
+    // Auto-sync kalau data jurnal berubah
+    window.addEventListener("journals:changed", () =>
+      this.updateArticleCount()
+    );
+
+    // Auto-sync antar tab
+    window.addEventListener("storage", (e) => {
+      if (e.key === "journals") this.updateArticleCount();
+    });
   }
 
   loadStatistics() {
@@ -86,26 +95,30 @@ class StatisticsManager {
   }
 
   updateArticleCount() {
-    // Count articles from journal list
-    const articles = document.querySelectorAll(".journal-item");
-    this.currentArticles = articles.length;
+    try {
+      const list = JSON.parse(localStorage.getItem("journals") || "[]");
+      this.currentArticles = Array.isArray(list) ? list.length : 0;
+    } catch {
+      this.currentArticles = 0;
+    }
+
+    if (this.articleCountElement) {
+      this.articleCountElement.textContent = String(this.currentArticles);
+    }
     this.saveStatistics();
   }
 
   startCounterAnimation() {
-    // Animate from 0 to current value
-    this.animateCounter(
-      this.articleCountElement,
-      0,
-      this.currentArticles,
-      1500
-    );
-    this.animateCounter(
-      this.visitorCountElement,
-      0,
-      this.currentVisitors,
-      2000
-    );
+    if (this.articleCountElement) {
+      const startA = parseInt(this.articleCountElement.textContent || "0", 10);
+      const endA = this.currentArticles || 0;
+      this.animateCounter(this.articleCountElement, startA, endA, 700);
+    }
+    if (this.visitorCountElement) {
+      const startV = parseInt(this.visitorCountElement.textContent || "0", 10);
+      const endV = this.currentVisitors || 0;
+      this.animateCounter(this.visitorCountElement, startV, endV, 900);
+    }
   }
 
   animateCounter(element, start, end, duration) {

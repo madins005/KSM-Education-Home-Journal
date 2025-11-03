@@ -42,8 +42,7 @@ class FormHandler {
     let fileData = null;
     const file = window.fileUploadManager.getUploadedFile();
 
-    if (file.size > 2 * 1024 * 1024) {
-      // > 2MB
+    if (file.size > 3 * 1024 * 1024) {
       const proceed = confirm(
         "File terlalu besar (" +
           Math.round(file.size / 1024 / 1024) +

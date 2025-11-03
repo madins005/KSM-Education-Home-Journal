@@ -29,10 +29,6 @@
         </nav>
         <div class="auth-section">
           <a href="#" class="btn-register">LOGIN</a>
-          <!-- <div class="search-box">
-            <i id="icon-search" data-feather="search"></i>
-            <input type="text" placeholder="cari jurnal..." />
-          </div> -->
         </div>
       </div>
     </header>
@@ -215,6 +211,28 @@
           <p><strong>Email:</strong> admin@ksmeducation.com</p>
           <p><strong>Password:</strong> admin123</p>
         </div> -->
+      </div>
+    </div>
+
+    <!-- Journal Preview Modal -->
+    <div id="previewModal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content preview-container">
+        <button type="button" class="close-modal" id="closePreviewModal">
+          <i data-feather="x"></i>
+        </button>
+
+        <div class="preview-header">
+          <div class="preview-meta">
+            <h3 id="previewTitle">Judul Jurnal</h3>
+            <p id="previewInfo">Tanggal • Penulis</p>
+          </div>
+          <div class="preview-actions"></div>
+        </div>
+
+        <div class="preview-body" id="previewBody">
+          <!-- Dinamis: iframe PDF / img / fallback -->
+        </div>
       </div>
     </div>
 

@@ -29,6 +29,17 @@ class PaginationManager {
     window.addEventListener("adminLoginStatusChanged", () => {
       this.syncLoginStatus();
     });
+
+    // di init() atau setelah this.journals terisi
+    const params = new URLSearchParams(location.search);
+    const sort = params.get("sort");
+    if (sort) {
+      this.sortJournals(sort); // 'newest' | 'oldest' | 'title'
+      this.currentPage = 1;
+      this.render();
+    }
+
+    
   }
 
   loadJournals() {
@@ -189,7 +200,9 @@ class PaginationManager {
       }" 
            alt="${journal.title}" 
            class="journal-thumbnail"
-           onclick="window.open('${journal.coverImage}', '_blank')">
+           onclick="window.previewViewer && window.previewViewer.openById(${
+             journal.id
+           })">
       <div class="journal-content">
         <div class="journal-meta">${journal.date} • ${authorsText}</div>
         <div class="journal-title">${journal.title}</div>

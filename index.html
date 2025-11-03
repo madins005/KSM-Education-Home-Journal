@@ -22,15 +22,38 @@
         </div>
         <nav class="active">
           <a href="#">HOME</a>
-          <a href="#journal">JURNAL</a>
+
+          <div class="nav-dropdown">
+            <button class="nav-link has-caret" type="button">
+              JURNAL
+              <svg
+                class="caret"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="dropdown-menu">
+              <a href="journals.html">Semua Jurnal</a>
+              <a href="journals.html?sort=newest">Terbaru</a>
+              <a href="journals.html?sort=oldest">Terlama</a>
+              <a href="journals.html#search">Cari Jurnal</a>
+            </div>
+          </div>
+
           <a href="#upload">UPLOAD</a>
         </nav>
         <div class="auth-section">
           <a href="#" class="btn-register">LOGIN</a>
-          <div class="search-box">
+          <!-- <div class="search-box">
             <i id="icon-search" data-feather="search"></i>
             <input type="text" placeholder="cari jurnal..." />
-          </div>
+          </div> -->
         </div>
       </div>
     </header>
@@ -297,7 +320,9 @@
               <input type="checkbox" id="rememberMe" />
               <span>Remember Me</span>
             </label>
-            <a href="https://wa.me/085712187669" class="forgot-password">Forgot Password?</a>
+            <a href="https://wa.me/085712187669" class="forgot-password"
+              >Forgot Password?</a
+            >
           </div>
 
           <button type="submit" class="btn-login">MASUK</button>
@@ -364,6 +389,28 @@
             <button type="submit" class="btn-save">SIMPAN</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Journal Preview Modal -->
+    <div id="previewModal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-content preview-container">
+        <button type="button" class="close-modal" id="closePreviewModal">
+          <i data-feather="x"></i>
+        </button>
+
+        <div class="preview-header">
+          <div class="preview-meta">
+            <h3 id="previewTitle">Judul Jurnal</h3>
+            <p id="previewInfo">Tanggal • Penulis</p>
+          </div>
+          <div class="preview-actions"></div>
+        </div>
+
+        <div class="preview-body" id="previewBody">
+          <!-- Dinamis: iframe PDF / img / fallback -->
+        </div>
       </div>
     </div>
 

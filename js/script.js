@@ -1,3 +1,136 @@
+// ===== Nav Dropdown Toggle =====
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".nav-dropdown").forEach((dd) => {
+    const btn = dd.querySelector(".nav-link.has-caret");
+    const menu = dd.querySelector(".dropdown-menu");
+
+    if (!btn || !menu) return;
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // tutup yang lain
+      document.querySelectorAll(".nav-dropdown.open").forEach((x) => {
+        if (x !== dd) x.classList.remove("open");
+      });
+      dd.classList.toggle("open");
+    });
+  });
+
+  // klik di luar untuk menutup
+  document.addEventListener("click", () => {
+    document
+      .querySelectorAll(".nav-dropdown.open")
+      .forEach((x) => x.classList.remove("open"));
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (location.hash === "#search") {
+    const search = document.querySelector(".search-box input");
+    if (search) {
+      search.focus();
+      search.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+});
+
+class PreviewViewer {
+  constructor() {
+    this.modal = document.getElementById("previewModal");
+    this.body = document.getElementById("previewBody");
+    this.title = document.getElementById("previewTitle");
+    this.info = document.getElementById("previewInfo");
+    this.closeBtn = document.getElementById("closePreviewModal");
+    this.currentId = null;
+
+    if (!this.modal || !this.body) return;
+
+    const overlay = this.modal.querySelector(".modal-overlay");
+    overlay?.addEventListener("click", () => this.close());
+    this.closeBtn?.addEventListener("click", () => this.close());
+  }
+
+  openById(id) {
+    this.currentId = id;
+    const journal = this.resolveJournal(id);
+    if (!journal) {
+      alert("Jurnal tidak ditemukan!");
+      return;
+    }
+    this.openWithJournal(journal);
+  }
+
+  resolveJournal(id) {
+    const idNum = Number(id);
+    if (window.journalManager?.journals) {
+      const j = window.journalManager.journals.find((x) => x.id === idNum);
+      if (j) return j;
+    }
+    if (window.paginationManager?.journals) {
+      const j = window.paginationManager.journals.find((x) => x.id === idNum);
+      if (j) return j;
+    }
+    try {
+      const list = JSON.parse(localStorage.getItem("journals") || "[]");
+      return list.find((x) => x.id === idNum) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  openWithJournal(j) {
+    this.title.textContent = j.title || "Untitled";
+    const authorsText = Array.isArray(j.author)
+      ? j.author.join(", ")
+      : j.author || "Unknown";
+    this.info.textContent = `${j.date || ""} • ${authorsText}`;
+    this.body.innerHTML = "";
+
+    const ext = (j.fileName || "").split(".").pop().toLowerCase();
+    const canPreviewPDF = !!j.fileData && ext === "pdf";
+    const canPreviewImage =
+      !!j.coverImage && /^data:image\//.test(j.coverImage);
+
+    if (canPreviewPDF) {
+      const iframe = document.createElement("iframe");
+      iframe.src = j.fileData; // data:application/pdf;base64,...
+      this.body.appendChild(iframe);
+    } else if (canPreviewImage) {
+      const img = document.createElement("img");
+      img.src = j.coverImage;
+      this.body.appendChild(img);
+    } else {
+      const box = document.createElement("div");
+      box.className = "preview-fallback";
+      box.innerHTML = `
+        <div>Preview tidak tersedia untuk tipe file ini (${
+          ext || "unknown"
+        }).</div>
+        <div class="hint">Gunakan menu Download di kartu/list untuk mengunduh file.</div>
+      `;
+      this.body.appendChild(box);
+    }
+
+    this.open();
+  }
+
+  open() {
+    this.modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+    try {
+      feather.replace();
+    } catch {}
+  }
+
+  close() {
+    this.modal.classList.remove("active");
+    document.body.style.overflow = "auto";
+    this.currentId = null;
+    this.body.innerHTML = "";
+  }
+}
+
 // ===== SEARCH FUNCTIONALITY =====
 
 class SearchManager {
@@ -171,8 +304,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("journalFullContainer")) {
     // Initialize EditJournalManager untuk journals page
     window.editJournalManager = new EditJournalManager();
-
     window.paginationManager = new PaginationManager();
+
+    window.previewViewer = new PreviewViewer();
     console.log("Journals page systems initialized");
     return;
   }
@@ -186,6 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.authorsManager = new AuthorsManager();
   window.editJournalManager = new EditJournalManager();
   window.formHandler = new FormHandler();
+  window.previewViewer = new PreviewViewer();
 
   // Sync login status
   if (window.loginManager) {

@@ -18,6 +18,7 @@ class JournalManager {
 
   saveJournals() {
     localStorage.setItem("journals", JSON.stringify(this.journals));
+    window.dispatchEvent(new Event("journals:changed"));
   }
 
   renderJournals() {
@@ -80,7 +81,9 @@ class JournalManager {
       }" 
            alt="${journal.title}" 
            class="journal-thumbnail"
-           onclick="window.open('${journal.coverImage}', '_blank')">
+           onclick="window.previewViewer && window.previewViewer.openById(${
+             journal.id
+           })">
       <div class="journal-content">
         <div class="journal-meta">${journal.date} • ${authorsText}</div>
         <div class="journal-title">${journal.title}</div>
@@ -178,7 +181,7 @@ class JournalManager {
       ...this.journals[index],
       title: updatedData.judulJurnal,
       description: updatedData.abstrak.substring(0, 100) + "...",
-      author: updatedData.namaPenulis, // Bisa array atau string
+      author: updatedData.namaPenulis,
       email: updatedData.email,
       contact: updatedData.kontak,
       fullAbstract: updatedData.abstrak,
