@@ -1,136 +1,181 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Dashboard - KSM Education</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
-  <link rel="stylesheet" href="./styles/dashboard_user.css" />
-  <script src="https://unpkg.com/feather-icons"></script>
-</head>
-<body>
-  <!-- Header -->
-  <header>
-    <div class="header-container">
-      <div class="logo">
-        <a href="./index.html"><img src="./assets/main_logo.png" alt="Logo" /></a>
-        <span class="logo-text">KSM EDUCATION</span>
-      </div>
-      <nav>
-        <a href="./index.html">HOME</a>
-        <a href="./journals.html">JURNAL</a>
-        <a href="#dashboard" class="active">DASHBOARD</a>
-      </nav>
-      <div class="auth-section">
-        <div class="user-profile" id="userProfile">
-          <div class="user-avatar">U</div>
-          <span class="user-name">USER</span>
-          <i data-feather="chevron-down" style="width: 16px; height: 16px;"></i>
-          <div class="dropdown-menu" id="dropdownMenu">
-            <div class="dropdown-item">
-              <i data-feather="user" style="width: 16px; height: 16px;"></i>
-              Profile
-            </div>
-            <div class="dropdown-item">
-              <i data-feather="settings" style="width: 16px; height: 16px;"></i>
-              Settings
-            </div>
-            <div class="dropdown-item" id="logoutBtn">
-              <i data-feather="log-out" style="width: 16px; height: 16px;"></i>
-              Logout
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard - KSM Education</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
+    <link rel="stylesheet" href="./styles/dashboard_user.css" />
+    <script src="https://unpkg.com/feather-icons"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <div class="header-container">
+        <div class="logo">
+          <a href="./index.html"
+            ><img src="./assets/main_logo.png" alt="Logo"
+          /></a>
+          <!-- <span class="logo-text">KSM EDUCATION</span> -->
+        </div>
+        <nav>
+          <a href="./index.html">HOME</a>
+
+          <div class="nav-dropdown" id="navDropdown">
+            <button
+              class="nav-link has-caret"
+              type="button"
+              id="navDropdownBtn"
+            >
+              JURNAL
+              <svg
+                class="caret"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="dropdown-menu" id="navDropdownMenu">
+              <a href="./journals.html">Semua Jurnal</a>
+              <a href="./journals.html#search">Cari Jurnal</a>
             </div>
           </div>
-        </div>
-        <div class="search-box">
-          <i data-feather="search"></i>
-          <input type="text" placeholder="cari jurnal..." />
+
+          <a href="#dashboard" class="active">DASHBOARD</a>
+        </nav>
+        <div class="auth-section">
+          <div class="user-profile" id="userProfile">
+            <div class="user-avatar">U</div>
+            <span class="user-name">USER</span>
+            <i
+              data-feather="chevron-down"
+              style="width: 16px; height: 16px"
+            ></i>
+            <div class="dropdown-menu" id="dropdownMenu">
+              <div class="dropdown-item">
+                <i data-feather="user" style="width: 16px; height: 16px"></i>
+                Profile
+              </div>
+              <div class="dropdown-item">
+                <i
+                  data-feather="settings"
+                  style="width: 16px; height: 16px"
+                ></i>
+                Settings
+              </div>
+              <div class="dropdown-item" id="logoutBtn">
+                <i data-feather="log-out" style="width: 16px; height: 16px"></i>
+                Logout
+              </div>
+            </div>
+          </div>
+          <div class="search-box">
+            <i data-feather="search"></i>
+            <input type="text" placeholder="cari jurnal..." />
+          </div>
         </div>
       </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Statistics Section -->
+      <section class="statistics">
+        <h2>Statistik</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i data-feather="bar-chart-2"></i>
+            </div>
+            <div class="stat-number" id="articleCount">0</div>
+            <div class="stat-label">Artikel</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i data-feather="eye"></i>
+            </div>
+            <div class="stat-number" id="visitorCount">0</div>
+            <div class="stat-label">Pengunjung</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Articles Section -->
+      <section class="articles-section">
+        <h2>Artikel Terbaru</h2>
+        <div class="articles-grid" id="articlesGrid">
+          <!-- Articles will be generated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section class="categories-section">
+        <h2>Kategori Populer</h2>
+        <div class="categories-grid">
+          <div class="category-card">
+            <span class="category-name">Social</span>
+            <span class="category-count">(17)</span>
+          </div>
+          <div class="category-card">
+            <span class="category-name">International</span>
+            <span class="category-count">(84)</span>
+          </div>
+          <div class="category-card">
+            <span class="category-name">Crime</span>
+            <span class="category-count">(32)</span>
+          </div>
+          <div class="category-card">
+            <span class="category-name">Accident</span>
+            <span class="category-count">(24)</span>
+          </div>
+          <div class="category-card">
+            <span class="category-name">Political</span>
+            <span class="category-count">(155)</span>
+          </div>
+          <div class="category-card">
+            <span class="category-name">Sports</span>
+            <span class="category-count">(1952)</span>
+          </div>
+          <div class="category-card">
+            <span class="category-name">Health</span>
+            <span class="category-count">(143)</span>
+          </div>
+          <div class="category-card">
+            <span class="category-name">Education</span>
+            <span class="category-count">(91)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter Section -->
+      <section class="newsletter-section">
+        <h3>Stay Tuned</h3>
+        <p>
+          Subscribe to our latest newsletter and never miss the latest news!
+        </p>
+        <div class="newsletter-form">
+          <input
+            type="email"
+            class="newsletter-input"
+            placeholder="Enter your email..."
+            id="newsletterEmail"
+          />
+          <button class="submit-btn" id="subscribeBtn">Submit</button>
+        </div>
+      </section>
     </div>
-  </header>
 
-  <!-- Main Content -->
-  <div class="container">
-    <!-- Statistics Section -->
-    <section class="statistics">
-      <h2>Statistik</h2>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i data-feather="bar-chart-2"></i>
-          </div>
-          <div class="stat-number" id="articleCount">0</div>
-          <div class="stat-label">Artikel</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i data-feather="eye"></i>
-          </div>
-          <div class="stat-number" id="visitorCount">0</div>
-          <div class="stat-label">Pengunjung</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Articles Section -->
-    <section class="articles-section">
-      <h2>Artikel Terbaru</h2>
-      <div class="articles-grid" id="articlesGrid">
-        <!-- Articles will be generated by JavaScript -->
-      </div>
-    </section>
-
-    <!-- Categories Section -->
-    <section class="categories-section">
-      <h2>Kategori Populer</h2>
-      <div class="categories-grid">
-        <div class="category-card">
-          <span class="category-name">Social</span>
-          <span class="category-count">(17)</span>
-        </div>
-        <div class="category-card">
-          <span class="category-name">International</span>
-          <span class="category-count">(84)</span>
-        </div>
-        <div class="category-card">
-          <span class="category-name">Crime</span>
-          <span class="category-count">(32)</span>
-        </div>
-        <div class="category-card">
-          <span class="category-name">Accident</span>
-          <span class="category-count">(24)</span>
-        </div>
-        <div class="category-card">
-          <span class="category-name">Political</span>
-          <span class="category-count">(155)</span>
-        </div>
-        <div class="category-card">
-          <span class="category-name">Sports</span>
-          <span class="category-count">(1952)</span>
-        </div>
-        <div class="category-card">
-          <span class="category-name">Health</span>
-          <span class="category-count">(143)</span>
-        </div>
-        <div class="category-card">
-          <span class="category-name">Education</span>
-          <span class="category-count">(91)</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Newsletter Section -->
-    <section class="newsletter-section">
-      <h3>Stay Tuned</h3>
-      <p>Subscribe to our latest newsletter and never miss the latest news!</p>
-      <div class="newsletter-form">
-        <input type="email" class="newsletter-input" placeholder="Enter your email..." id="newsletterEmail" />
-        <button class="submit-btn" id="subscribeBtn">Submit</button>
-      </div>
-    </section>
-  </div>
-
-  <script src="./js/dashboard_user.js"></script>
-</body>
+    <script src="./js/statistic.js"></script>
+    <script src="./js/script.js"></script>
+    <script src="./js/dashboard_user.js"></script>
+  </body>
 </html>

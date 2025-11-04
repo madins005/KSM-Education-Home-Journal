@@ -1,14 +1,98 @@
+// ===== NAV DROPDOWN TOGGLE =====
+class NavDropdownManager {
+  constructor() {
+    this.navDropdown = document.getElementById("navDropdown");
+    this.navDropdownBtn = document.getElementById("navDropdownBtn");
+    this.navDropdownMenu = document.getElementById("navDropdownMenu");
+    this.init();
+  }
+
+  init() {
+    if (!this.navDropdownBtn || !this.navDropdownMenu) return;
+
+    // Click button untuk toggle
+    this.navDropdownBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.toggle();
+    });
+
+    // Click di luar untuk close
+    document.addEventListener("click", () => {
+      this.close();
+    });
+
+    // Prevent close saat click di dalam menu
+    this.navDropdownMenu.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+  }
+
+  toggle() {
+    this.navDropdown.classList.toggle("open");
+  }
+
+  open() {
+    this.navDropdown.classList.add("open");
+  }
+
+  close() {
+    this.navDropdown.classList.remove("open");
+  }
+}
+
+// ===== DROPDOWN MANAGER (User Profile) =====
+class DropdownManager {
+  constructor() {
+    this.userProfile = document.getElementById("userProfile");
+    this.dropdownMenu = document.getElementById("dropdownMenu");
+    this.init();
+  }
+
+  init() {
+    if (!this.userProfile || !this.dropdownMenu) return;
+
+    // Click pada profile untuk toggle dropdown
+    this.userProfile.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.toggleDropdown();
+    });
+
+    // Click di luar untuk close dropdown
+    document.addEventListener("click", () => {
+      this.closeDropdown();
+    });
+
+    // Prevent dropdown close saat click di dalam menu
+    this.dropdownMenu.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+  }
+
+  toggleDropdown() {
+    this.dropdownMenu.classList.toggle("show");
+  }
+
+  openDropdown() {
+    this.dropdownMenu.classList.add("show");
+  }
+
+  closeDropdown() {
+    this.dropdownMenu.classList.remove("show");
+  }
+}
+
 // ===== INITIALIZE FEATHER ICONS =====
 feather.replace();
 
 // ===== LOAD ARTICLES FROM LOCALSTORAGE =====
 function loadArticles() {
-  const stored = localStorage.getItem('journals');
+  const stored = localStorage.getItem("journals");
   if (stored) {
     try {
       return JSON.parse(stored);
     } catch (e) {
-      console.error('Error parsing journals:', e);
+      console.error("Error parsing journals:", e);
       return [];
     }
   }
@@ -19,11 +103,10 @@ let articles = loadArticles();
 
 // ===== RENDER ARTICLES =====
 function renderArticles() {
-  const grid = document.getElementById('articlesGrid');
-  
-  // Reload articles from localStorage setiap render
+  const grid = document.getElementById("articlesGrid");
+
   articles = loadArticles();
-  
+
   if (articles.length === 0) {
     grid.innerHTML = `
       <div class="empty-state">
@@ -37,17 +120,26 @@ function renderArticles() {
     return;
   }
 
-  grid.innerHTML = articles.map(article => `
+  grid.innerHTML = articles
+    .map(
+      (article) => `
     <div class="article-card">
       <div class="article-image-container">
-        <img src="${article.coverImage || 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&h=400&fit=crop'}" alt="${article.judul}" class="article-image">
+        <img src="${
+          article.coverImage ||
+          "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&h=400&fit=crop"
+        }" alt="${article.title || article.judul}" class="article-image">
       </div>
       <div class="article-content">
-        <div class="article-meta">${article.authors ? article.authors.join(', ').toUpperCase() : 'ADMIN'} • ${article.uploadDate || new Date().toLocaleDateString('id-ID')}</div>
-        <div class="article-title">${article.judul || article.title || 'Untitled'}</div>
+        <div class="article-meta">${
+          article.author ? (Array.isArray(article.author) ? article.author.join(", ") : article.author).toUpperCase() : "ADMIN"
+        } • ${article.date || new Date().toLocaleDateString("id-ID")}</div>
+        <div class="article-title">${article.title || article.judul || "Untitled"}</div>
       </div>
     </div>
-  `).join('');
+  `
+    )
+    .join("");
 }
 
 // ===== AUTO REFRESH ARTICLES EVERY 5 SECONDS =====
@@ -56,89 +148,100 @@ setInterval(() => {
   articles = loadArticles();
   if (articles.length !== currentCount) {
     renderArticles();
-    updateStatistics();
+    if (window.statsManager) {
+      window.statsManager.updateArticleCount();
+    }
   }
 }, 5000);
 
-// ===== UPDATE STATISTICS WITH REAL DATA =====
-function updateStatistics() {
-  const articleCount = articles.length;
-  const visitorCount = parseInt(localStorage.getItem('visitorCount') || '0');
-  
-  animateCount(document.getElementById('articleCount'), articleCount);
-  animateCount(document.getElementById('visitorCount'), visitorCount);
+// ===== SYNC VISITOR COUNT KE STATISTICSMANAGER =====
+function syncVisitorCount() {
+  const oldVisitorKey = parseInt(localStorage.getItem("visitorCount") || "0");
+  if (oldVisitorKey > 0) {
+    const stats = JSON.parse(localStorage.getItem("siteStatistics") || "{}");
+    stats.visitors = Math.max(stats.visitors || 0, oldVisitorKey);
+    stats.lastVisit = new Date().toISOString();
+    stats.uniqueVisitorId =
+      stats.uniqueVisitorId ||
+      "visitor_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem("siteStatistics", JSON.stringify(stats));
+    localStorage.removeItem("visitorCount");
+  }
 }
-
-// ===== ANIMATE COUNTER =====
-function animateCount(element, target) {
-  let current = parseInt(element.textContent) || 0;
-  const increment = Math.ceil(Math.abs(target - current) / 50);
-  
-  const timer = setInterval(() => {
-    if (current < target) {
-      current = Math.min(current + increment, target);
-      element.textContent = current;
-      element.classList.add('counting');
-    } else if (current > target) {
-      current = Math.max(current - increment, target);
-      element.textContent = current;
-      element.classList.add('counting');
-    } else {
-      element.classList.remove('counting');
-      clearInterval(timer);
-    }
-  }, 20);
-}
-
-// ===== DROPDOWN FUNCTIONALITY =====
-const userProfile = document.getElementById('userProfile');
-const dropdownMenu = document.getElementById('dropdownMenu');
-
-userProfile.addEventListener('click', (e) => {
-  e.stopPropagation();
-  dropdownMenu.classList.toggle('show');
-});
-
-document.addEventListener('click', () => {
-  dropdownMenu.classList.remove('show');
-});
 
 // ===== LOGOUT FUNCTIONALITY =====
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  if (confirm('Yakin ingin logout?')) {
-    sessionStorage.removeItem('userLoggedIn');
-    sessionStorage.removeItem('userEmail');
-    sessionStorage.removeItem('userType');
-    localStorage.removeItem('userEmail');
-    window.location.href = './login_user.html';
+function setupLogout() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      if (confirm("Yakin ingin logout?")) {
+        sessionStorage.removeItem("userLoggedIn");
+        sessionStorage.removeItem("userEmail");
+        sessionStorage.removeItem("userType");
+        sessionStorage.removeItem("visitorTracked");
+        localStorage.removeItem("userEmail");
+        window.location.href = "./login_user.html";
+      }
+    });
   }
-});
+}
 
 // ===== NEWSLETTER SUBSCRIPTION =====
-document.getElementById('subscribeBtn').addEventListener('click', () => {
-  const email = document.getElementById('newsletterEmail').value.trim();
-  if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    alert('Terima kasih! Anda telah berhasil subscribe newsletter.');
-    document.getElementById('newsletterEmail').value = '';
-  } else {
-    alert('Mohon masukkan email yang valid.');
+function setupNewsletter() {
+  const subscribeBtn = document.getElementById("subscribeBtn");
+  const newsletterEmail = document.getElementById("newsletterEmail");
+  if (subscribeBtn && newsletterEmail) {
+    subscribeBtn.addEventListener("click", () => {
+      const email = newsletterEmail.value.trim();
+      if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert("Terima kasih! Anda telah berhasil subscribe newsletter.");
+        newsletterEmail.value = "";
+      } else {
+        alert("Mohon masukkan email yang valid.");
+      }
+    });
   }
-});
-
-// ===== CHECK IF USER IS LOGGED IN =====
-if (sessionStorage.getItem('userLoggedIn') !== 'true') {
-  window.location.href = './login_user.html';
 }
 
 // ===== SET USER NAME FROM SESSION =====
-const userEmail = sessionStorage.getItem('userEmail');
-if (userEmail) {
-  const userName = userEmail.split('@')[0].toUpperCase();
-  document.querySelector('.user-name').textContent = userName;
-  document.querySelector('.user-avatar').textContent = userName.charAt(0);
+function setUserName() {
+  const userEmail = sessionStorage.getItem("userEmail");
+  if (userEmail) {
+    const userName = userEmail.split("@")[0].toUpperCase();
+    const userNameEl = document.querySelector(".user-name");
+    const userAvatarEl = document.querySelector(".user-avatar");
+    if (userNameEl) userNameEl.textContent = userName;
+    if (userAvatarEl) userAvatarEl.textContent = userName.charAt(0);
+  }
+}
+
+// ===== CHECK IF USER IS LOGGED IN =====
+if (sessionStorage.getItem("userLoggedIn") !== "true") {
+  window.location.href = "./login_user.html";
 }
 
 // ===== INITIALIZE =====
-renderArticles();
-updateStatistics();
-feather.replace();
+document.addEventListener("DOMContentLoaded", () => {
+  // Init dropdowns
+  window.navDropdownManager = new NavDropdownManager();
+  window.dropdownManager = new DropdownManager();
+
+  // Sync visitor count
+  syncVisitorCount();
+
+  // Init StatisticsManager
+  if (typeof StatisticsManager !== "undefined" && !window.statsManager) {
+    window.statsManager = new StatisticsManager();
+  }
+
+  // Setup UI
+  setUserName();
+  setupLogout();
+  setupNewsletter();
+
+  // Render artikel
+  renderArticles();
+
+  // Feather replace
+  feather.replace();
+});

@@ -108,8 +108,6 @@
             </button>
             <div class="dropdown-menu">
               <a href="journals.html">Semua Jurnal</a>
-              <a href="journals.html?sort=newest">Terbaru</a>
-              <a href="journals.html?sort=oldest">Terlama</a>
               <a href="journals.html#search">Cari Jurnal</a>
             </div>
           </div>
@@ -503,33 +501,5 @@
     <script src="./js/login.js"></script>
     <script src="./js/form_handler.js"></script>
     <script src="./js/pagination.js"></script>
-    <script>
-      feather.replace();
-
-      // Initialize visitor count if not exists
-      if (!localStorage.getItem("visitorCount")) {
-        localStorage.setItem("visitorCount", "0");
-      }
-
-      // Increment visitor count on page load
-      let visitorCount = parseInt(localStorage.getItem("visitorCount") || "0");
-      visitorCount++;
-      localStorage.setItem("visitorCount", visitorCount.toString());
-
-      // Update statistics display
-      function updateStatisticsDisplay() {
-        const journals = JSON.parse(localStorage.getItem("journals") || "[]");
-        const visitors = parseInt(localStorage.getItem("visitorCount") || "0");
-
-        document.getElementById("articleCount").textContent = journals.length;
-        document.getElementById("visitorCount").textContent = visitors;
-      }
-
-      // Run on page load
-      updateStatisticsDisplay();
-
-      // Update every 2 seconds to reflect changes
-      setInterval(updateStatisticsDisplay, 2000);
-    </script>
   </body>
 </html>

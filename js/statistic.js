@@ -1,55 +1,97 @@
-// ===== REAL-TIME STATISTICS SYSTEM =====
-
 class StatisticsManager {
   constructor() {
     this.articleCountElement = document.getElementById("articleCount");
     this.visitorCountElement = document.getElementById("visitorCount");
     this.isAnimating = false;
-
-    // Initialize statistics
     this.init();
   }
 
   init() {
     if (!this.articleCountElement && !this.visitorCountElement) return;
 
+    // 1. Load dulu dari storage
     this.loadStatistics();
+
+    // 2. Track visitor (increment jika hari baru)
     this.trackVisitor();
 
-    // Hitung dari localStorage (bukan dari DOM)
+    // 3. Hitung artikel (read-only dari localStorage)
     this.updateArticleCount();
 
-    // Animasi awal (opsional)
-    this.startCounterAnimation();
+    // 4. Set tampilan awal ke 0 SEBELUM animasi
+    if (this.articleCountElement) this.articleCountElement.textContent = "0";
+    if (this.visitorCountElement) this.visitorCountElement.textContent = "0";
 
-    // Periodic (opsional)
-    this.setupPeriodicUpdates();
-
-    // Auto-sync kalau data jurnal berubah
-    window.addEventListener("journals:changed", () =>
-      this.updateArticleCount()
-    );
-
-    // Auto-sync antar tab
-    window.addEventListener("storage", (e) => {
-      if (e.key === "journals") this.updateArticleCount();
+    // 5. Tunda animasi sedikit agar DOM sudah stabil
+    requestAnimationFrame(() => {
+      this.startCounterAnimation();
     });
+
+    // 6. Setup listener (jangan langsung ubah textContent, animasikan kalau perlu)
+    window.addEventListener("journals:changed", () => {
+      const oldCount = this.currentArticles;
+      this.updateArticleCount();
+      if (this.articleCountElement && this.currentArticles !== oldCount) {
+        this.animateCounter(
+          this.articleCountElement,
+          oldCount,
+          this.currentArticles,
+          600
+        );
+      }
+    });
+
+    window.addEventListener("storage", (e) => {
+      if (e.key === "journals") {
+        const oldCount = this.currentArticles;
+        this.updateArticleCount();
+        if (this.articleCountElement && this.currentArticles !== oldCount) {
+          this.animateCounter(
+            this.articleCountElement,
+            oldCount,
+            this.currentArticles,
+            600
+          );
+        }
+      }
+      if (e.key === "siteStatistics") {
+        const s = this.getStoredStats();
+        const oldV = this.currentVisitors;
+        this.currentVisitors = s.visitors || 0;
+        if (this.visitorCountElement && this.currentVisitors !== oldV) {
+          this.animateCounter(
+            this.visitorCountElement,
+            oldV,
+            this.currentVisitors,
+            600
+          );
+        }
+      }
+    });
+
+    // 7. HAPUS atau disable setupPeriodicUpdates kalau tidak diperlukan
+    // this.setupPeriodicUpdates(); // <-- DISABLE INI untuk menghindari loncatan acak
   }
 
   loadStatistics() {
-    // Get stored statistics or initialize
     const stats = this.getStoredStats();
-    this.currentArticles = stats.articles;
-    this.currentVisitors = stats.visitors;
+    this.currentArticles = stats.articles || 0;
+    this.currentVisitors = stats.visitors || 0;
   }
 
   getStoredStats() {
     const stored = localStorage.getItem("siteStatistics");
     if (stored) {
-      return JSON.parse(stored);
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return this.defaultStats();
+      }
     }
+    return this.defaultStats();
+  }
 
-    // Initialize new statistics
+  defaultStats() {
     return {
       articles: 0,
       visitors: 0,
@@ -60,8 +102,8 @@ class StatisticsManager {
 
   saveStatistics() {
     const stats = {
-      articles: this.currentArticles,
-      visitors: this.currentVisitors,
+      articles: this.currentArticles || 0,
+      visitors: this.currentVisitors || 0,
       lastVisit: new Date().toISOString(),
       uniqueVisitorId: this.getStoredStats().uniqueVisitorId,
     };
@@ -70,27 +112,24 @@ class StatisticsManager {
 
   generateVisitorId() {
     return (
-      "visitor_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9)
+      "visitor_" + Date.now() + "_" + Math.random().toString(36).substring(2, 9)
     );
   }
 
   trackVisitor() {
     const stats = this.getStoredStats();
-    const today = new Date().toDateString();
-    const lastVisit = stats.lastVisit
-      ? new Date(stats.lastVisit).toDateString()
-      : null;
 
-    // Increment visitor count if it's a new day or first visit
-    if (!lastVisit || lastVisit !== today) {
-      this.currentVisitors++;
+    // Cek apakah session ini sudah di-track
+    // Jika belum pernah di-track di session ini, tambah visitor
+    if (!sessionStorage.getItem("visitorTracked")) {
+      this.currentVisitors = (stats.visitors || 0) + 1;
       this.saveStatistics();
-    }
 
-    // Track session visitors (for demo purposes)
-    const sessionVisitors = sessionStorage.getItem("sessionVisitorCount");
-    if (!sessionVisitors) {
-      sessionStorage.setItem("sessionVisitorCount", "1");
+      // Mark sudah di-track di session ini (jangan tambah lagi)
+      sessionStorage.setItem("visitorTracked", "1");
+    } else {
+      // Session sudah di-track, ambil nilai terkini saja
+      this.currentVisitors = stats.visitors || 0;
     }
   }
 
@@ -101,28 +140,32 @@ class StatisticsManager {
     } catch {
       this.currentArticles = 0;
     }
-
-    if (this.articleCountElement) {
-      this.articleCountElement.textContent = String(this.currentArticles);
-    }
+    // JANGAN langsung set textContent di sini, biar animasi yang handle
     this.saveStatistics();
   }
 
   startCounterAnimation() {
+    // Animasi dari 0 → nilai target
     if (this.articleCountElement) {
-      const startA = parseInt(this.articleCountElement.textContent || "0", 10);
-      const endA = this.currentArticles || 0;
-      this.animateCounter(this.articleCountElement, startA, endA, 700);
+      this.animateCounter(
+        this.articleCountElement,
+        0,
+        this.currentArticles,
+        700
+      );
     }
     if (this.visitorCountElement) {
-      const startV = parseInt(this.visitorCountElement.textContent || "0", 10);
-      const endV = this.currentVisitors || 0;
-      this.animateCounter(this.visitorCountElement, startV, endV, 900);
+      this.animateCounter(
+        this.visitorCountElement,
+        0,
+        this.currentVisitors,
+        900
+      );
     }
   }
 
   animateCounter(element, start, end, duration) {
-    if (this.isAnimating) return;
+    if (!element) return;
 
     element.classList.add("counting");
     const startTime = performance.now();
@@ -131,17 +174,15 @@ class StatisticsManager {
     const updateCounter = (currentTime) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-
-      // Easing function for smooth animation
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
       const current = Math.floor(start + range * easeOutQuart);
 
-      element.textContent = current;
+      element.textContent = String(current);
 
       if (progress < 1) {
         requestAnimationFrame(updateCounter);
       } else {
-        element.textContent = end;
+        element.textContent = String(end);
         element.classList.remove("counting");
       }
     };
@@ -150,44 +191,54 @@ class StatisticsManager {
   }
 
   incrementArticleCount() {
+    const old = this.currentArticles;
     this.currentArticles++;
     this.saveStatistics();
-    this.animateCounter(
-      this.articleCountElement,
-      parseInt(this.articleCountElement.textContent),
-      this.currentArticles,
-      500
-    );
-  }
-
-  decrementArticleCount() {
-    if (this.currentArticles > 0) {
-      this.currentArticles--;
-      this.saveStatistics();
+    if (this.articleCountElement) {
       this.animateCounter(
         this.articleCountElement,
-        parseInt(this.articleCountElement.textContent),
+        old,
         this.currentArticles,
         500
       );
     }
   }
 
-  incrementVisitorCount() {
-    this.currentVisitors++;
-    this.saveStatistics();
-    this.animateCounter(
-      this.visitorCountElement,
-      parseInt(this.visitorCountElement.textContent),
-      this.currentVisitors,
-      500
-    );
+  decrementArticleCount() {
+    if (this.currentArticles > 0) {
+      const old = this.currentArticles;
+      this.currentArticles--;
+      this.saveStatistics();
+      if (this.articleCountElement) {
+        this.animateCounter(
+          this.articleCountElement,
+          old,
+          this.currentArticles,
+          500
+        );
+      }
+    }
   }
 
+  incrementVisitorCount() {
+    const old = this.currentVisitors;
+    this.currentVisitors++;
+    this.saveStatistics();
+    if (this.visitorCountElement) {
+      this.animateCounter(
+        this.visitorCountElement,
+        old,
+        this.currentVisitors,
+        500
+      );
+    }
+  }
+
+  // DISABLE atau hapus setupPeriodicUpdates kalau tidak diperlukan
   setupPeriodicUpdates() {
-    // Simulate real-time visitor updates (for demo)
+    // Simulasi visitor acak (5% setiap 10 detik)
+    // Ini bisa bikin loncat angka, sebaiknya dihapus untuk produksi
     setInterval(() => {
-      // Random chance to simulate a new visitor (5% chance every 10 seconds)
       if (Math.random() < 0.05) {
         this.incrementVisitorCount();
       }
@@ -200,7 +251,7 @@ class StatisticsManager {
     this.currentArticles = 0;
     this.currentVisitors = 0;
     this.saveStatistics();
-    this.articleCountElement.textContent = "0";
-    this.visitorCountElement.textContent = "0";
+    if (this.articleCountElement) this.articleCountElement.textContent = "0";
+    if (this.visitorCountElement) this.visitorCountElement.textContent = "0";
   }
 }
