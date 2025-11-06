@@ -121,21 +121,21 @@ function syncVisitorCount() {
   }
 }
 
-function setupLogout() {
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      if (confirm("Yakin ingin logout?")) {
-        sessionStorage.removeItem("userLoggedIn");
-        sessionStorage.removeItem("userEmail");
-        sessionStorage.removeItem("userType");
-        sessionStorage.removeItem("visitorTracked");
-        localStorage.removeItem("userEmail");
-        window.location.href = "./login_user.html";
-      }
-    });
-  }
-}
+// function setupLogout() {
+//   const logoutBtn = document.getElementById("logoutBtn");
+//   if (logoutBtn) {
+//     logoutBtn.addEventListener("click", () => {
+//       if (confirm("Yakin ingin logout?")) {
+//         sessionStorage.removeItem("userLoggedIn");
+//         sessionStorage.removeItem("userEmail");
+//         sessionStorage.removeItem("userType");
+//         sessionStorage.removeItem("visitorTracked");
+//         localStorage.removeItem("userEmail");
+//         window.location.href = "./login_user.html";
+//       }
+//     });
+//   }
+// }
 
 function setupNewsletter() {
   const subscribeBtn = document.getElementById("subscribeBtn");
@@ -153,16 +153,16 @@ function setupNewsletter() {
   }
 }
 
-function setUserName() {
-  const userEmail = sessionStorage.getItem("userEmail");
-  if (userEmail) {
-    const userName = userEmail.split("@")[0].toUpperCase();
-    const userNameEl = document.querySelector(".user-name");
-    const userAvatarEl = document.querySelector(".user-avatar");
-    if (userNameEl) userNameEl.textContent = userName;
-    if (userAvatarEl) userAvatarEl.textContent = userName.charAt(0);
-  }
-}
+// function setUserName() {
+//   const userEmail = sessionStorage.getItem("userEmail");
+//   if (userEmail) {
+//     const userName = userEmail.split("@")[0].toUpperCase();
+//     const userNameEl = document.querySelector(".user-name");
+//     const userAvatarEl = document.querySelector(".user-avatar");
+//     if (userNameEl) userNameEl.textContent = userName;
+//     if (userAvatarEl) userAvatarEl.textContent = userName.charAt(0);
+//   }
+// }
 
 // if (sessionStorage.getItem("userLoggedIn") !== "true") {
 //   window.location.href = "./login_user.html";
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   setUserName();
-  setupLogout();
+  // setupLogout(); // Bisa dihapus atau keep
   setupNewsletter();
 
   renderArticles();
