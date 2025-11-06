@@ -1,0 +1,450 @@
+/* ========================================
+   RESPONSIVE.CSS - KSM EDUCATION
+   Tambahkan file ini ke index.html dengan:
+   
+   ======================================== */
+
+/* Hamburger Menu Button */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+
+.hamburger-menu span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background: #2c3e50;
+  transition: all 0.3s ease;
+  border-radius: 3px;
+}
+
+.hamburger-menu.active span:nth-child(1) {
+  transform: rotate(45deg) translate(7px, 7px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Mobile Navigation Overlay */
+.nav-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Prevent body scroll when menu is open */
+body.menu-open {
+  overflow: hidden;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+/* Tablet & Mobile (768px and below) */
+@media (max-width: 768px) {
+  /* Header adjustments */
+  .header-container {
+    padding: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .logo {
+    order: 1;
+    flex: 0 0 auto;
+  }
+
+  .logo img {
+    height: 40px;
+  }
+
+  /* Show hamburger menu */
+  .hamburger-menu {
+    display: flex;
+    order: 3;
+    margin-left: auto;
+  }
+
+  /* Navigation transforms to mobile menu */
+  nav {
+    position: fixed !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 80% !important;
+    max-width: 300px !important;
+    height: 100vh !important;
+    background: white !important;
+    flex-direction: column !important;
+    padding: 80px 0 2rem 0 !important;
+    gap: 0 !important;
+    transition: left 0.3s ease !important;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15) !important;
+    z-index: 1000 !important;
+    overflow-y: auto !important;
+    display: flex !important;
+  }
+
+  nav.active {
+    left: 0 !important;
+  }
+
+  nav a {
+    font-size: 16px !important;
+    padding: 1rem 2rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    width: 100% !important;
+    display: block !important;
+    text-align: left !important;
+  }
+
+  /* Dropdown adjustments for mobile */
+  .nav-dropdown {
+    width: 100% !important;
+  }
+
+  .nav-link.has-caret {
+    width: 100% !important;
+    padding: 1rem 2rem !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    font-size: 16px !important;
+  }
+
+  .dropdown-menu {
+    position: static !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    box-shadow: none !important;
+    display: none !important;
+    background: #f8f9fa !important;
+    padding: 0 !important;
+    min-width: 100% !important;
+  }
+
+  .nav-dropdown.active .dropdown-menu {
+    display: block !important;
+  }
+
+  .dropdown-menu a {
+    padding: 0.75rem 3rem !important;
+    font-size: 14px !important;
+    background: #f8f9fa !important;
+  }
+
+  .dropdown-menu a:hover {
+    background: #e9ecef !important;
+  }
+
+  /* Auth section adjustments */
+  .auth-section {
+    order: 2;
+    width: 100%;
+    margin-top: 1rem;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-user-login,
+  .btn-register {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  /* Container adjustments */
+  .container {
+    padding: 1rem;
+  }
+
+  /* Statistics grid */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  /* Journal list & sections */
+  .journal-list,
+  .upload-section,
+  .statistics {
+    padding: 1.5rem;
+  }
+
+  section h2 {
+    font-size: 22px;
+  }
+
+  section h3 {
+    font-size: 18px;
+  }
+
+  /* Form adjustments */
+  .drop-zone,
+  .cover-drop-zone {
+    padding: 2rem 1rem;
+  }
+
+  .upload-icon svg {
+    width: 50px;
+    height: 50px;
+  }
+
+  .upload-text {
+    font-size: 14px;
+  }
+
+  .upload-subtext {
+    font-size: 13px;
+  }
+
+  /* Modal adjustments */
+  .modal-content {
+    width: 95%;
+    max-width: 95%;
+    margin: 1rem;
+  }
+
+  .login-container,
+  .edit-container,
+  .preview-container {
+    padding: 1.5rem;
+  }
+
+  /* Form groups */
+  .form-group input,
+  .form-group textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 12px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+
+  /* Author input groups */
+  .author-input-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-remove-author {
+    width: 100%;
+  }
+
+  .btn-add-author {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Buttons */
+  .btn-submit,
+  .btn-login,
+  .btn-save {
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  /* Journal cards */
+  .journal-card {
+    padding: 1rem;
+  }
+
+  .journal-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  /* Edit actions */
+  .edit-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .edit-actions button {
+    width: 100%;
+  }
+
+  /* File preview */
+  .file-preview {
+    padding: 1rem;
+  }
+
+  .file-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Cover preview */
+  .cover-preview {
+    max-width: 100%;
+  }
+
+  .cover-preview img {
+    max-height: 250px;
+  }
+}
+
+/* Small Mobile (480px and below) */
+@media (max-width: 480px) {
+  .header-container {
+    padding: 0.75rem;
+  }
+
+  .logo img {
+    height: 35px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 16px;
+  }
+
+  .stat-number {
+    font-size: 28px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+  }
+
+  .stat-icon svg,
+  .stat-icon i {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  nav {
+    width: 85% !important;
+  }
+
+  .btn-user-login,
+  .btn-register {
+    font-size: 12px;
+    padding: 10px 16px;
+  }
+
+  .modal-content {
+    width: 100%;
+    margin: 0.5rem;
+    border-radius: 8px;
+  }
+
+  .drop-zone,
+  .cover-drop-zone {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .login-logo {
+    max-width: 120px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  nav {
+    padding-top: 60px !important;
+  }
+
+  nav a,
+  .nav-link.has-caret {
+    padding: 0.75rem 2rem !important;
+  }
+
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Very small devices */
+@media (max-width: 360px) {
+  .header-container {
+    padding: 0.5rem;
+  }
+
+  .logo img {
+    height: 30px;
+  }
+
+  .hamburger-menu span {
+    width: 22px;
+  }
+
+  .btn-user-login,
+  .btn-register {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+
+  section h2 {
+    font-size: 18px;
+  }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Show only on mobile */
+.show-mobile {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .show-mobile {
+    display: block !important;
+  }
+}
