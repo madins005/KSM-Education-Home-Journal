@@ -544,6 +544,39 @@ class EditJournalManager {
   }
 }
 
+// ===== LOGIN STATUS SYNC =====
+function syncLoginStatusUI() {
+  const isLoggedIn = sessionStorage.getItem("userLoggedIn") === "true";
+  const isAdmin = sessionStorage.getItem("userType") === "admin";
+
+  // Dispatch custom event untuk notify semua manager
+  window.dispatchEvent(
+    new CustomEvent("loginStatusChanged", {
+      detail: { isLoggedIn, isAdmin },
+    })
+  );
+
+  // Re-render journal jika ada
+  if (
+    window.journalManager &&
+    typeof window.journalManager.renderJournals === "function"
+  ) {
+    window.journalManager.renderJournals();
+  }
+
+  // Re-render pagination jika ada
+  if (
+    window.paginationManager &&
+    typeof window.paginationManager.render === "function"
+  ) {
+    window.paginationManager.render();
+  }
+}
+
+// Listen untuk login status changes
+window.addEventListener("adminLoginStatusChanged", syncLoginStatusUI);
+
+// ===== INITIALIZE ALL SYSTEMS =====
 // ===== INITIALIZE ALL SYSTEMS =====
 document.addEventListener("DOMContentLoaded", () => {
   setupNavDropdown();
@@ -554,12 +587,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (document.getElementById("journalFullContainer")) {
+    // UNTUK HALAMAN journals.html
     if (typeof EditJournalManager !== "undefined")
       window.editJournalManager = new EditJournalManager();
     if (typeof PaginationManager !== "undefined")
       window.paginationManager = new PaginationManager();
     window.previewViewer = new PreviewViewer();
     console.log("Journals page systems initialized");
+
+    // SYNC LOGIN STATUS UNTUK RENDER TOMBOL
+    syncLoginStatusUI();
     return;
   }
 
@@ -571,6 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // UNTUK HALAMAN dashboard_admin.html DAN index.html
   if (typeof StatisticsManager !== "undefined")
     window.statsManager = new StatisticsManager();
   if (typeof JournalManager !== "undefined")
@@ -598,6 +636,9 @@ document.addEventListener("DOMContentLoaded", () => {
       window.statsManager.startCounterAnimation();
     }, 100);
   }
+
+  // SYNC LOGIN STATUS UNTUK RENDER TOMBOL DI ADMIN
+  syncLoginStatusUI();
 
   console.log("✅ All systems initialized successfully");
 });

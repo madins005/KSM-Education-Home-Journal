@@ -149,6 +149,13 @@ class LoginManager {
       password === this.adminCredentials.password
     ) {
       this.isLoggedIn = true;
+
+      // SET SESSIONSTROAGE UNTUK FUNGSI DELETE
+      sessionStorage.setItem("userLoggedIn", "true");
+      sessionStorage.setItem("userType", "admin");
+      sessionStorage.setItem("userEmail", email);
+
+      // SET LOCALSTORAGE UNTUK PERSISTENT LOGIN
       localStorage.setItem("adminLoggedIn", "true");
       localStorage.setItem("adminLoginTime", new Date().toISOString());
 
@@ -162,7 +169,7 @@ class LoginManager {
       this.updateUploadSection();
       this.closeLoginModal();
 
-      alert("Login berhasil!\n\nSelamat datang, Admin!");
+      alert("LOGIN BERHASIL\n\nSELAMAT DATANG, ADMIN");
 
       this.loginForm.reset();
 
@@ -172,20 +179,25 @@ class LoginManager {
         })
       );
     } else {
-      alert("Login gagal!\n\nEmail atau password salah.");
+      alert("LOGIN GAGAL\n\nEMAIL ATAU PASSWORD SALAH");
     }
   }
 
   logout() {
-    if (confirm("Yakin mau logout?")) {
+    if (confirm("YAKIN MAU LOGOUT?")) {
       this.isLoggedIn = false;
       localStorage.removeItem("adminLoggedIn");
       localStorage.removeItem("adminLoginTime");
 
+      // HAPUS JUGA DARI sessionStorage
+      sessionStorage.removeItem("userLoggedIn");
+      sessionStorage.removeItem("userType");
+      sessionStorage.removeItem("userEmail");
+
       this.updateLoginButton();
       this.updateUploadSection();
 
-      alert("Logout berhasil!");
+      alert("LOGOUT BERHASIL");
 
       window.dispatchEvent(
         new CustomEvent("adminLoginStatusChanged", {
@@ -207,6 +219,10 @@ class LoginManager {
       if (diffMinutes > 60) {
         localStorage.removeItem("adminLoggedIn");
         localStorage.removeItem("adminLoginTime");
+        // HAPUS JUGA DARI sessionStorage
+        sessionStorage.removeItem("userLoggedIn");
+        sessionStorage.removeItem("userType");
+        sessionStorage.removeItem("userEmail");
         this.isLoggedIn = false;
         return;
       }
@@ -214,6 +230,17 @@ class LoginManager {
 
     if (loggedIn === "true") {
       this.isLoggedIn = true;
+
+      // SET SESSIONSTROAGE JIKA BELUM ADA (saat page reload)
+      if (sessionStorage.getItem("userLoggedIn") !== "true") {
+        sessionStorage.setItem("userLoggedIn", "true");
+        sessionStorage.setItem("userType", "admin");
+        sessionStorage.setItem(
+          "userEmail",
+          localStorage.getItem("adminEmail") || "admin@ksmeducation.com"
+        );
+      }
+
       this.updateLoginButton();
       this.updateUploadSection();
     } else {

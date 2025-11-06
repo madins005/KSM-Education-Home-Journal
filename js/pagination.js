@@ -190,49 +190,66 @@ class PaginationManager {
       authorsText = journal.author || "Unknown";
     }
 
+    // CEK STATUS LOGIN DAN HALAMAN
+    const isLoggedIn = sessionStorage.getItem("userLoggedIn") === "true";
+    const isAdmin = sessionStorage.getItem("userType") === "admin";
+    const currentPage = window.location.pathname;
+
+    // LOGIKA PENGECUALIAN: Tombol EDIT & DELETE keliatan HANYA jika:
+    // 1. Admin sudah login, DAN
+    // 2. Sedang di halaman dashboard_admin.html atau journals.html (admin page)
+    const isAdminPage =
+      currentPage.includes("dashboard_admin") ||
+      currentPage.includes("journals.html");
+
+    const showEditDeleteButtons = isLoggedIn && isAdmin && isAdminPage;
+
+    // RENDER TOMBOL EDIT & DELETE HANYA DI ADMIN PAGE
+    const editDeleteButtons = showEditDeleteButtons
+      ? `
+    <button class="btn-edit" onclick="paginationManager.editJournal(${journal.id})">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+      </svg>
+      EDIT
+    </button>
+    <button class="btn-delete" onclick="paginationManager.deleteJournal(${journal.id})">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+      </svg>
+      HAPUS
+    </button>
+  `
+      : "";
+
     div.innerHTML = `
-      <span class="file-badge">${fileExtension}</span>
-      <img src="${
-        journal.coverImage ||
-        "https://via.placeholder.com/140x180/4a5568/ffffff?text=No+Cover"
-      }" 
-           alt="${journal.title}" 
-           class="journal-thumbnail"
-           onclick="window.previewViewer && window.previewViewer.openById(${
-             journal.id
-           })">
-      <div class="journal-content">
-        <div class="journal-meta">${journal.date} • ${authorsText}</div>
-        <div class="journal-title">${journal.title}</div>
-        <div class="journal-description">${journal.description}</div>
-        <div class="journal-actions">
-          <button class="btn-download" onclick="paginationManager.downloadJournal(${
-            journal.id
-          })">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-            </svg>
-            Download
-          </button>
-          <button class="btn-edit" onclick="paginationManager.editJournal(${
-            journal.id
-          })">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-            </svg>
-            Edit
-          </button>
-          <button class="btn-delete" onclick="paginationManager.deleteJournal(${
-            journal.id
-          })">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-            </svg>
-            Hapus
-          </button>
-        </div>
+    <span class="file-badge">${fileExtension}</span>
+    <img src="${
+      journal.coverImage ||
+      "https://via.placeholder.com/140x180/4a5568/ffffff?text=No+Cover"
+    }" 
+         alt="${journal.title}" 
+         class="journal-thumbnail"
+         onclick="window.previewViewer && window.previewViewer.openById(${
+           journal.id
+         })">
+    <div class="journal-content">
+      <div class="journal-meta">${journal.date} • ${authorsText}</div>
+      <div class="journal-title">${journal.title}</div>
+      <div class="journal-description">${journal.description}</div>
+      <div class="journal-actions">
+        <button class="btn-download" onclick="paginationManager.downloadJournal(${
+          journal.id
+        })">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          DOWNLOAD
+        </button>
+        ${editDeleteButtons}
       </div>
-    `;
+    </div>
+  `;
     return div;
   }
 
@@ -338,22 +355,30 @@ class PaginationManager {
   }
 
   deleteJournal(id) {
-    // Cek admin login
-    if (!window.loginManager || !window.loginManager.isAdmin()) {
-      alert("Harus login sebagai admin untuk menghapus jurnal!");
-      if (window.loginManager) window.loginManager.openLoginModal();
+    // CEK STATUS LOGIN LANGSUNG DARI sessionStorage
+    const isLoggedIn = sessionStorage.getItem("userLoggedIn") === "true";
+    const isAdmin = sessionStorage.getItem("userType") === "admin";
+
+    // JIKA TIDAK LOGIN ATAU BUKAN ADMIN
+    if (!isLoggedIn || !isAdmin) {
+      alert("HARUS LOGIN SEBAGAI ADMIN UNTUK MENGHAPUS JURNAL");
       return;
     }
 
-    if (!confirm("Yakin mau hapus jurnal ini?")) return;
+    // CONFIRM DELETE
+    if (!confirm("YAKIN MAU HAPUS JURNAL INI?")) return;
 
+    // CARI DAN HAPUS JURNAL
     const index = this.journals.findIndex((j) => j.id === id);
     if (index > -1) {
-      this.journals.splice(index, 1);
+      const deleted = this.journals.splice(index, 1)[0];
       localStorage.setItem("journals", JSON.stringify(this.journals));
       window.dispatchEvent(new Event("journals:changed"));
       this.render();
-      alert("Jurnal berhasil dihapus!");
+
+      alert("JURNAL '" + deleted.title.toUpperCase() + "' BERHASIL DIHAPUS");
+    } else {
+      alert("JURNAL TIDAK DITEMUKAN");
     }
   }
 

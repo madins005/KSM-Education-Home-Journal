@@ -72,50 +72,57 @@ class JournalManager {
       authorsText = journal.author || "Unknown";
     }
 
+    // PAKSA RENDER TOMBOL (UNTUK TESTING DI ADMIN)
+    const currentPage = window.location.pathname;
+    const isAdminDashboard = currentPage.includes("dashboard_admin");
+
+    // JIKA DI ADMIN DASHBOARD, PAKSA TAMPILKAN TOMBOL
+    const editDeleteButtons = isAdminDashboard
+      ? `
+    <button class="btn-edit" onclick="window.editJournalManager && window.editJournalManager.openEditModal(${journal.id})" title="EDIT">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
+        <path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+      </svg>
+      EDIT
+    </button>
+    <button class="btn-delete" onclick="journalManager.deleteJournal(${journal.id})" title="DELETE">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
+      </svg>
+      DELETE
+    </button>
+  `
+      : "";
+
     div.innerHTML = `
-      <span class="file-badge">${fileExtension}</span>
-      <img src="${
-        journal.coverImage ||
-        "https://via.placeholder.com/150x200/4a5568/ffffff?text=No+Cover"
-      }" 
-           alt="${journal.title}" 
-           class="journal-thumbnail"
-           onclick="window.previewViewer && window.previewViewer.openById(${
-             journal.id
-           })">
-      <div class="journal-content">
-        <div class="journal-meta">${journal.date} • ${authorsText}</div>
-        <div class="journal-title">${journal.title}</div>
-        <div class="journal-description">${journal.description}</div>
-        <div class="journal-actions">
-          <button class="btn-download" onclick="journalManager.downloadJournal(${
-            journal.id
-          })" title="Download">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-            </svg>
-            Download
-          </button>
-          <button class="btn-edit" onclick="window.editJournalManager && window.editJournalManager.openEditModal(${
-            journal.id
-          })" title="Edit">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
-              <path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-            </svg>
-            Edit
-          </button>
-          <button class="btn-delete" onclick="journalManager.deleteJournal(${
-            journal.id
-          })" title="Delete">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
-            </svg>
-            Delete
-          </button>
-        </div>
+    <span class="file-badge">${fileExtension}</span>
+    <img src="${
+      journal.coverImage ||
+      "https://via.placeholder.com/150x200/4a5568/ffffff?text=No+Cover"
+    }" 
+         alt="${journal.title}" 
+         class="journal-thumbnail"
+         onclick="window.previewViewer && window.previewViewer.openById(${
+           journal.id
+         })">
+    <div class="journal-content">
+      <div class="journal-meta">${journal.date} • ${authorsText}</div>
+      <div class="journal-title">${journal.title}</div>
+      <div class="journal-description">${journal.description}</div>
+      <div class="journal-actions">
+        <button class="btn-download" onclick="journalManager.downloadJournal(${
+          journal.id
+        })" title="DOWNLOAD">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          DOWNLOAD
+        </button>
+        ${editDeleteButtons}
       </div>
-    `;
+    </div>
+  `;
     return div;
   }
 
@@ -142,7 +149,7 @@ class JournalManager {
       email: journalData.email,
       contact: journalData.kontak,
       fullAbstract: capitalize(journalData.abstrak),
-      tags: journalData.tags || [], // Tambah ini
+      tags: journalData.tags || [],
     };
 
     this.journals.unshift(newJournal);
@@ -154,46 +161,54 @@ class JournalManager {
     const journal = this.journals.find((j) => j.id === id);
 
     if (!journal) {
-      alert("Jurnal tidak ditemukan!");
+      alert("JURNAL TIDAK DITEMUKAN");
       return;
     }
 
     if (!journal.fileData) {
-      alert("File tidak tersedia untuk diunduh!");
+      alert("FILE TIDAK TERSEDIA UNTUK DIUNDUH");
       return;
     }
 
     const link = document.createElement("a");
     link.href = journal.fileData;
-    link.download = journal.fileName || "jurnal.pdf";
+    link.download = journal.fileName || "JURNAL.PDF";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    alert("Download dimulai!\n\nFile: " + journal.fileName);
+    alert("DOWNLOAD DIMULAI\n\nFILE: " + journal.fileName);
   }
 
   deleteJournal(id) {
-    // Cek admin login
-    if (!window.loginManager || !window.loginManager.isAdmin()) {
-      alert("Harus login sebagai admin untuk menghapus jurnal!");
-      if (window.loginManager) window.loginManager.openLoginModal();
+    // CEK STATUS LOGIN LANGSUNG DARI sessionStorage
+    const isLoggedIn = sessionStorage.getItem("userLoggedIn") === "true";
+    const isAdmin = sessionStorage.getItem("userType") === "admin";
+
+    // JIKA TIDAK LOGIN ATAU BUKAN ADMIN
+    if (!isLoggedIn || !isAdmin) {
+      alert("HARUS LOGIN SEBAGAI ADMIN UNTUK MENGHAPUS JURNAL");
       return;
     }
 
-    if (!confirm("Yakin mau hapus jurnal ini?")) return;
+    // CONFIRM DELETE
+    if (!confirm("YAKIN MAU HAPUS JURNAL INI?")) return;
 
+    // CARI DAN HAPUS JURNAL
     const index = this.journals.findIndex((j) => j.id === id);
     if (index > -1) {
       const deleted = this.journals.splice(index, 1)[0];
       this.saveJournals();
       this.renderJournals();
 
+      // UPDATE STATS JIKA ADA
       if (window.statsManager) {
         window.statsManager.decrementArticleCount();
       }
 
-      alert("Jurnal '" + deleted.title + "' berhasil dihapus!");
+      alert("JURNAL '" + deleted.title.toUpperCase() + "' BERHASIL DIHAPUS");
+    } else {
+      alert("JURNAL TIDAK DITEMUKAN");
     }
   }
 
@@ -225,7 +240,7 @@ class JournalManager {
       };
       this.saveJournals();
       this.renderJournals();
-      alert("Jurnal berhasil diupdate!");
+      alert("JURNAL BERHASIL DIUPDATE");
     }
   }
 
