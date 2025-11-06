@@ -1,267 +1,185 @@
-// ===== MOBILE MENU - CLEAN & PROFESSIONAL =====
+/**
+ * RESPONSIVE.JS - KSM EDUCATION
+ * Mobile Menu & Responsive Functionality
+ * 
+ * Tambahkan file ini ke index.html dengan:
+ * <script src="./js/responsive.js"></script>
+ */
 
 document.addEventListener('DOMContentLoaded', function() {
-  
-  // ===== Utilities =====
-  const isMobile = () => window.innerWidth <= 767;
-
-  // ===== Create Elements =====
-  
-  function createHamburgerMenu() {
-    const headerContainer = document.querySelector('.header-container');
-    if (!headerContainer || document.querySelector('.hamburger-menu')) return null;
-
-    const hamburger = document.createElement('button');
-    hamburger.className = 'hamburger-menu';
-    hamburger.setAttribute('aria-label', 'Toggle Menu');
-    hamburger.setAttribute('aria-expanded', 'false');
-    hamburger.innerHTML = `
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    `;
-
-    headerContainer.appendChild(hamburger);
-    return hamburger;
-  }
-
-  function createOverlay() {
-    if (document.querySelector('.mobile-overlay')) {
-      return document.querySelector('.mobile-overlay');
-    }
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'mobile-overlay';
-    document.body.appendChild(overlay);
-    return overlay;
-  }
-
-  function createMobileAuthButtons() {
-    const nav = document.querySelector('nav');
-    if (!nav || document.querySelector('.mobile-auth-buttons')) return null;
-
-    const authButtons = document.createElement('div');
-    authButtons.className = 'mobile-auth-buttons';
-    authButtons.innerHTML = `
-      <a href="./login_user.html" class="btn-mobile-login btn-mobile-user">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span>User</span>
-      </a>
-      <button class="btn-mobile-login btn-mobile-admin" type="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-          <path d="M2 17l10 5 10-5"></path>
-          <path d="M2 12l10 5 10-5"></path>
-        </svg>
-        <span>Admin</span>
-      </button>
-    `;
-
-    // Add admin button click handler
-    const adminBtn = authButtons.querySelector('.btn-mobile-admin');
-    if (adminBtn) {
-      adminBtn.addEventListener('click', function() {
-        const registerBtn = document.querySelector('.btn-register');
-        if (registerBtn) {
-          registerBtn.click();
-        }
-      });
-    }
-
-    nav.appendChild(authButtons);
-    return authButtons;
-  }
-
-  function createMobileSearchButton() {
-    const nav = document.querySelector('nav');
-    if (!nav || document.querySelector('.mobile-search-btn')) return null;
-
-    const searchBtn = document.createElement('button');
-    searchBtn.className = 'mobile-search-btn';
-    searchBtn.type = 'button';
-    searchBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"></circle>
-        <path d="m21 21-4.35-4.35"></path>
-      </svg>
-      <span>Search</span>
-    `;
-
-    searchBtn.addEventListener('click', function() {
-      closeMenu();
-      setTimeout(() => {
-        const headerSearch = document.querySelector('.search-box input');
-        if (headerSearch) {
-          headerSearch.focus();
-          headerSearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 300);
-    });
-
-    const authButtons = nav.querySelector('.mobile-auth-buttons');
-    if (authButtons) {
-      nav.insertBefore(searchBtn, authButtons);
-    } else {
-      nav.appendChild(searchBtn);
-    }
-    
-    return searchBtn;
-  }
-
-  // ===== Initialize =====
-  
-  const hamburger = createHamburgerMenu();
-  const overlay = createOverlay();
+  // Get elements
+  const header = document.querySelector('.header-container');
   const nav = document.querySelector('nav');
-  const navDropdown = document.querySelector('.nav-dropdown');
-  const navDropdownBtn = document.querySelector('.nav-link.has-caret');
-
-  if (!hamburger || !nav || !overlay) {
-    console.warn('Mobile menu: Required elements not found');
+  const authSection = document.querySelector('.auth-section');
+  
+  if (!header || !nav) {
+    console.error('Required elements not found');
     return;
   }
-
-  createMobileAuthButtons();
-  createMobileSearchButton();
-
-  // === Tambahan untuk menghapus tombol Search kecil ===
-  const mobileSearchBtn = document.querySelector('.mobile-search-btn');
-  if (mobileSearchBtn) {
-    mobileSearchBtn.remove();
-    console.log('🔍 Tombol Search kecil dihapus karena sudah ada search bar utama.');
-  }
-  // =====================================================
-
-  // ===== Menu Functions =====
   
+  // Create hamburger menu button
+  const hamburger = document.createElement('button');
+  hamburger.className = 'hamburger-menu';
+  hamburger.setAttribute('aria-label', 'Toggle menu');
+  hamburger.setAttribute('type', 'button');
+  hamburger.innerHTML = '<span></span><span></span><span></span>';
+  
+  // Create overlay for mobile menu
+  const overlay = document.createElement('div');
+  overlay.className = 'nav-overlay';
+  document.body.appendChild(overlay);
+  
+  // Insert hamburger button before auth section
+  if (authSection) {
+    header.insertBefore(hamburger, authSection);
+  } else {
+    header.appendChild(hamburger);
+  }
+  
+  /**
+   * Toggle mobile menu
+   */
   function toggleMenu() {
-    const isActive = nav.classList.toggle('active');
-    hamburger.classList.toggle('active');
-    overlay.classList.toggle('active');
-    hamburger.setAttribute('aria-expanded', isActive);
+    const isActive = hamburger.classList.contains('active');
     
-    document.body.style.overflow = isActive ? 'hidden' : '';
-    
-    // Haptic feedback
-    if (navigator.vibrate) {
-      navigator.vibrate(10);
+    if (isActive) {
+      // Close menu
+      hamburger.classList.remove('active');
+      nav.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.classList.remove('menu-open');
+    } else {
+      // Open menu
+      hamburger.classList.add('active');
+      nav.classList.add('active');
+      overlay.classList.add('active');
+      document.body.classList.add('menu-open');
     }
   }
-
-  function closeMenu() {
-    nav.classList.remove('active');
-    hamburger.classList.remove('active');
-    overlay.classList.remove('active');
-    hamburger.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-    
-    // Reset dropdown
-    if (navDropdown) {
-      navDropdown.classList.remove('active');
-    }
-  }
-
-  // ===== Event Listeners =====
   
-  // Hamburger click
+  /**
+   * Close mobile menu
+   */
+  function closeMenu() {
+    hamburger.classList.remove('active');
+    nav.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.classList.remove('menu-open');
+    
+    // Also close any open dropdowns
+    const activeDropdown = document.querySelector('.nav-dropdown.active');
+    if (activeDropdown) {
+      activeDropdown.classList.remove('active');
+    }
+  }
+  
+  // Hamburger click event
   hamburger.addEventListener('click', function(e) {
     e.stopPropagation();
     toggleMenu();
   });
-
-  // Overlay click
-  overlay.addEventListener('click', closeMenu);
-
-  // Nav links click
-  const navLinks = nav.querySelectorAll('a:not(.btn-mobile-login)');
+  
+  // Overlay click event - close menu
+  overlay.addEventListener('click', function() {
+    closeMenu();
+  });
+  
+  // Handle navigation links - close menu when clicked
+  const navLinks = document.querySelectorAll('nav > a');
   navLinks.forEach(function(link) {
     link.addEventListener('click', function() {
-      if (isMobile()) {
-        setTimeout(closeMenu, 200);
+      if (window.innerWidth <= 768) {
+        closeMenu();
       }
     });
   });
-
-  // Dropdown toggle
-  if (navDropdownBtn && navDropdown) {
-    navDropdownBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (isMobile()) {
-        navDropdown.classList.toggle('active');
+  
+  // Handle dropdown toggle on mobile
+  const dropdownButton = document.querySelector('.nav-link.has-caret');
+  const dropdown = document.querySelector('.nav-dropdown');
+  
+  if (dropdownButton && dropdown) {
+    dropdownButton.addEventListener('click', function(e) {
+      // Only prevent default and toggle on mobile
+      if (window.innerWidth <= 768) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdown.classList.toggle('active');
       }
+    });
+    
+    // Close dropdown when clicking dropdown links
+    const dropdownLinks = dropdown.querySelectorAll('.dropdown-menu a');
+    dropdownLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+          closeMenu();
+        }
+      });
     });
   }
-
-  // Prevent nav clicks from closing menu
-  nav.addEventListener('click', function(e) {
-    e.stopPropagation();
-  });
-
-  // Window resize
+  
+  // Close menu when window is resized to desktop
   let resizeTimer;
   window.addEventListener('resize', function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
-      if (window.innerWidth > 767) {
+      if (window.innerWidth > 768) {
         closeMenu();
       }
     }, 250);
   });
-
-  // ESC key
+  
+  // Prevent clicks inside nav from closing menu
+  nav.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  // Close menu when clicking outside (on desktop this won't trigger due to overlay)
+  document.addEventListener('click', function(e) {
+    if (window.innerWidth <= 768) {
+      const isClickInsideNav = nav.contains(e.target);
+      const isClickOnHamburger = hamburger.contains(e.target);
+      
+      if (!isClickInsideNav && !isClickOnHamburger && nav.classList.contains('active')) {
+        closeMenu();
+      }
+    }
+  });
+  
+  // Handle escape key to close menu
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && nav.classList.contains('active')) {
       closeMenu();
     }
   });
-
-  // ===== Touch Gestures =====
   
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  nav.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-
-  nav.addEventListener('touchend', function(e) {
-    touchEndX = e.changedTouches[0].screenX;
-    const swipeDistance = touchEndX - touchStartX;
-    
-    // Swipe right to close (>100px)
-    if (swipeDistance > 100) {
-      closeMenu();
-    }
-  }, { passive: true });
-
-  // ===== Smooth Scroll =====
-  
-  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-    anchor.addEventListener('click', function(e) {
+  // Optional: Add smooth scroll for anchor links
+  const anchorLinks = document.querySelectorAll('a[href^="#"]');
+  anchorLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
       const href = this.getAttribute('href');
       
-      if (href !== '#' && href.length > 1) {
-        const target = document.querySelector(href);
+      // Skip if it's just "#" or modal trigger
+      if (href === '#' || href.includes('Modal')) {
+        return;
+      }
+      
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        closeMenu();
         
-        if (target) {
-          e.preventDefault();
-          closeMenu();
-          
-          setTimeout(function() {
-            target.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'start' 
-            });
-          }, 300);
-        }
+        // Smooth scroll to target
+        setTimeout(function() {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 300);
       }
     });
   });
-
-  console.log('✅ Mobile menu initialized successfully');
+  
+  console.log('✅ Responsive menu initialized');
 });
