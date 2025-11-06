@@ -17,14 +17,20 @@
     <header>
       <div class="header-container">
         <div class="logo">
-          <a href="./index.html"
+          <a href="./dashboard_admin.html"
             ><img src="./assets/main_logo.png" alt="Logo"
           /></a>
           <!-- <span class="logo-text">KSM EDUCATION</span> -->
         </div>
         <nav>
-          <a href="./index.html">HOME</a>
-          <a href="./journals.html">JURNAL</a>
+          <a href="./dashboard_admin.html">HOME</a>
+          <div class="nav-dropdown">
+            <a href="#" class="nav-link has-caret">JURNAL</a>
+            <div class="dropdown-menu">
+              <a href="./journals.html">Daftar Jurnal</a>
+              <a href="./opinions.html">Daftar Opini</a>
+            </div>
+          </div>
           <a href="#dashboard" class="active">DASHBOARD</a>
         </nav>
         <div class="auth-section">
@@ -150,6 +156,9 @@
     </div>
 
     <script src="./js/statistic.js"></script>
+    <script src="./js/jurnal.js"></script>
+    <script src="./js/opinions_manager.js"></script>
+    <script src="./js/file_upload.js"></script>
     <script src="./js/dashboard_user.js"></script>
   </body>
 </html>

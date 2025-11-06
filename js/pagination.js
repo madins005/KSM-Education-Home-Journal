@@ -38,8 +38,6 @@ class PaginationManager {
       this.currentPage = 1;
       this.render();
     }
-
-    
   }
 
   loadJournals() {
@@ -327,59 +325,36 @@ class PaginationManager {
   }
 
   editJournal(id) {
+    // Cek admin login
     if (!window.loginManager || !window.loginManager.isAdmin()) {
       alert("Harus login sebagai admin untuk mengedit jurnal!");
-      if (window.loginManager) {
-        window.loginManager.openLoginModal();
-      }
-      return;
-    }
-
-    const journal = this.journals.find((j) => j.id === id);
-
-    if (!journal) {
-      alert("Jurnal tidak ditemukan!");
+      if (window.loginManager) window.loginManager.openLoginModal();
       return;
     }
 
     if (window.editJournalManager) {
-      window.editJournalManager.openEditModal(journal);
-    } else {
-      alert("Edit manager belum siap!");
+      window.editJournalManager.openEditModal(id);
     }
   }
 
   deleteJournal(id) {
+    // Cek admin login
     if (!window.loginManager || !window.loginManager.isAdmin()) {
       alert("Harus login sebagai admin untuk menghapus jurnal!");
-      if (window.loginManager) {
-        window.loginManager.openLoginModal();
-      }
+      if (window.loginManager) window.loginManager.openLoginModal();
       return;
     }
 
-    if (!confirm("Yakin mau hapus jurnal ini?")) {
-      return;
+    if (!confirm("Yakin mau hapus jurnal ini?")) return;
+
+    const index = this.journals.findIndex((j) => j.id === id);
+    if (index > -1) {
+      this.journals.splice(index, 1);
+      localStorage.setItem("journals", JSON.stringify(this.journals));
+      window.dispatchEvent(new Event("journals:changed"));
+      this.render();
+      alert("Jurnal berhasil dihapus!");
     }
-
-    this.journals = this.journals.filter((j) => j.id !== id);
-    localStorage.setItem("journals", JSON.stringify(this.journals));
-
-    if (window.statsManager) {
-      window.statsManager.decrementArticleCount();
-    }
-
-    const filteredJournals = this.filterJournals();
-    const totalPages = Math.ceil(
-      filteredJournals.length / this.journalsPerPage
-    );
-
-    if (this.currentPage > totalPages && this.currentPage > 1) {
-      this.currentPage--;
-    }
-
-    this.render();
-    alert("Jurnal berhasil dihapus!");
   }
 
   updateJournal(id, updatedData) {

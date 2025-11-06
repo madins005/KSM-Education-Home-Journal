@@ -1,47 +1,27 @@
-// ===== NAV DROPDOWN TOGGLE =====
-class NavDropdownManager {
-  constructor() {
-    this.navDropdown = document.getElementById("navDropdown");
-    this.navDropdownBtn = document.getElementById("navDropdownBtn");
-    this.navDropdownMenu = document.getElementById("navDropdownMenu");
-    this.init();
-  }
+function setupNavDropdown() {
+  document.querySelectorAll(".nav-dropdown").forEach((dd) => {
+    const btn = dd.querySelector(".nav-link.has-caret");
+    const menu = dd.querySelector(".dropdown-menu");
 
-  init() {
-    if (!this.navDropdownBtn || !this.navDropdownMenu) return;
+    if (!btn || !menu) return;
 
-    // Click button untuk toggle
-    this.navDropdownBtn.addEventListener("click", (e) => {
+    btn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      this.toggle();
+      document.querySelectorAll(".nav-dropdown.open").forEach((x) => {
+        if (x !== dd) x.classList.remove("open");
+      });
+      dd.classList.toggle("open");
     });
+  });
 
-    // Click di luar untuk close
-    document.addEventListener("click", () => {
-      this.close();
-    });
-
-    // Prevent close saat click di dalam menu
-    this.navDropdownMenu.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-  }
-
-  toggle() {
-    this.navDropdown.classList.toggle("open");
-  }
-
-  open() {
-    this.navDropdown.classList.add("open");
-  }
-
-  close() {
-    this.navDropdown.classList.remove("open");
-  }
+  document.addEventListener("click", () => {
+    document
+      .querySelectorAll(".nav-dropdown.open")
+      .forEach((x) => x.classList.remove("open"));
+  });
 }
 
-// ===== DROPDOWN MANAGER (User Profile) =====
 class DropdownManager {
   constructor() {
     this.userProfile = document.getElementById("userProfile");
@@ -52,18 +32,15 @@ class DropdownManager {
   init() {
     if (!this.userProfile || !this.dropdownMenu) return;
 
-    // Click pada profile untuk toggle dropdown
     this.userProfile.addEventListener("click", (e) => {
       e.stopPropagation();
       this.toggleDropdown();
     });
 
-    // Click di luar untuk close dropdown
     document.addEventListener("click", () => {
       this.closeDropdown();
     });
 
-    // Prevent dropdown close saat click di dalam menu
     this.dropdownMenu.addEventListener("click", (e) => {
       e.stopPropagation();
     });
@@ -73,38 +50,23 @@ class DropdownManager {
     this.dropdownMenu.classList.toggle("show");
   }
 
-  openDropdown() {
-    this.dropdownMenu.classList.add("show");
-  }
-
   closeDropdown() {
     this.dropdownMenu.classList.remove("show");
   }
 }
 
-// ===== INITIALIZE FEATHER ICONS =====
 feather.replace();
 
-// ===== LOAD ARTICLES FROM LOCALSTORAGE =====
 function loadArticles() {
-  const stored = localStorage.getItem("journals");
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch (e) {
-      console.error("Error parsing journals:", e);
-      return [];
-    }
-  }
-  return [];
+  const journals = JSON.parse(localStorage.getItem("journals") || "[]");
+  const opinions = JSON.parse(localStorage.getItem("opinions") || "[]");
+  return [...journals, ...opinions].sort((a, b) => b.id - a.id);
 }
 
 let articles = loadArticles();
 
-// ===== RENDER ARTICLES =====
 function renderArticles() {
   const grid = document.getElementById("articlesGrid");
-
   articles = loadArticles();
 
   if (articles.length === 0) {
@@ -121,6 +83,7 @@ function renderArticles() {
   }
 
   grid.innerHTML = articles
+    .slice(0, 6)
     .map(
       (article) => `
     <div class="article-card">
@@ -128,13 +91,15 @@ function renderArticles() {
         <img src="${
           article.coverImage ||
           "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&h=400&fit=crop"
-        }" alt="${article.title || article.judul}" class="article-image">
+        }" alt="${article.title}" class="article-image">
       </div>
       <div class="article-content">
         <div class="article-meta">${
-          article.author ? (Array.isArray(article.author) ? article.author.join(", ") : article.author).toUpperCase() : "ADMIN"
+          Array.isArray(article.author)
+            ? article.author.join(", ")
+            : article.author || "ADMIN"
         } • ${article.date || new Date().toLocaleDateString("id-ID")}</div>
-        <div class="article-title">${article.title || article.judul || "Untitled"}</div>
+        <div class="article-title">${article.title || "Untitled"}</div>
       </div>
     </div>
   `
@@ -142,19 +107,6 @@ function renderArticles() {
     .join("");
 }
 
-// ===== AUTO REFRESH ARTICLES EVERY 5 SECONDS =====
-setInterval(() => {
-  const currentCount = articles.length;
-  articles = loadArticles();
-  if (articles.length !== currentCount) {
-    renderArticles();
-    if (window.statsManager) {
-      window.statsManager.updateArticleCount();
-    }
-  }
-}, 5000);
-
-// ===== SYNC VISITOR COUNT KE STATISTICSMANAGER =====
 function syncVisitorCount() {
   const oldVisitorKey = parseInt(localStorage.getItem("visitorCount") || "0");
   if (oldVisitorKey > 0) {
@@ -169,7 +121,6 @@ function syncVisitorCount() {
   }
 }
 
-// ===== LOGOUT FUNCTIONALITY =====
 function setupLogout() {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
@@ -186,7 +137,6 @@ function setupLogout() {
   }
 }
 
-// ===== NEWSLETTER SUBSCRIPTION =====
 function setupNewsletter() {
   const subscribeBtn = document.getElementById("subscribeBtn");
   const newsletterEmail = document.getElementById("newsletterEmail");
@@ -203,7 +153,6 @@ function setupNewsletter() {
   }
 }
 
-// ===== SET USER NAME FROM SESSION =====
 function setUserName() {
   const userEmail = sessionStorage.getItem("userEmail");
   if (userEmail) {
@@ -215,33 +164,36 @@ function setUserName() {
   }
 }
 
-// ===== CHECK IF USER IS LOGGED IN =====
 if (sessionStorage.getItem("userLoggedIn") !== "true") {
   window.location.href = "./login_user.html";
 }
 
-// ===== INITIALIZE =====
 document.addEventListener("DOMContentLoaded", () => {
-  // Init dropdowns
-  window.navDropdownManager = new NavDropdownManager();
+  setupNavDropdown();
   window.dropdownManager = new DropdownManager();
 
-  // Sync visitor count
   syncVisitorCount();
 
-  // Init StatisticsManager
   if (typeof StatisticsManager !== "undefined" && !window.statsManager) {
     window.statsManager = new StatisticsManager();
   }
 
-  // Setup UI
   setUserName();
   setupLogout();
   setupNewsletter();
 
-  // Render artikel
   renderArticles();
 
-  // Feather replace
+  setInterval(() => {
+    const currentCount = articles.length;
+    articles = loadArticles();
+    if (articles.length !== currentCount) {
+      renderArticles();
+      if (window.statsManager) {
+        window.statsManager.updateArticleCount();
+      }
+    }
+  }, 5000);
+
   feather.replace();
 });

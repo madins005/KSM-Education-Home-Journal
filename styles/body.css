@@ -542,7 +542,7 @@
   border-color: #2c3e50;
 }
 
-.btn-remove-author {
+.btn-remove-author, .btn-remove-pengurus {
   background: #f44336;
   color: white;
   border: none;
@@ -557,17 +557,17 @@
   flex-shrink: 0;
 }
 
-.btn-remove-author:hover {
+.btn-remove-author:hover, .btn-remove-pengurus:hover {
   background: #d32f2f;
   transform: scale(1.1);
 }
 
-.btn-remove-author i {
+.btn-remove-author , .btn-remove-pengurus i {
   width: 18px;
   height: 18px;
 }
 
-.btn-add-author {
+.btn-add-author, .btn-secondary {
   background: linear-gradient(135deg, #4caf50, #8bc34a);
   color: white;
   padding: 10px 20px;

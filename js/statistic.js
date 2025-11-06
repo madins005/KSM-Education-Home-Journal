@@ -9,25 +9,25 @@ class StatisticsManager {
   init() {
     if (!this.articleCountElement && !this.visitorCountElement) return;
 
-    // 1. Load dulu dari storage
+    //Load dulu dari storage
     this.loadStatistics();
 
-    // 2. Track visitor (increment jika hari baru)
+    //Track visitor (increment jika hari baru)
     this.trackVisitor();
 
-    // 3. Hitung artikel (read-only dari localStorage)
+    //Hitung artikel (read-only dari localStorage)
     this.updateArticleCount();
 
-    // 4. Set tampilan awal ke 0 SEBELUM animasi
+    // Set tampilan awal ke 0 SEBELUM animasi
     if (this.articleCountElement) this.articleCountElement.textContent = "0";
     if (this.visitorCountElement) this.visitorCountElement.textContent = "0";
 
-    // 5. Tunda animasi sedikit agar DOM sudah stabil
+    // Tunda animasi sedikit agar DOM sudah stabil
     requestAnimationFrame(() => {
       this.startCounterAnimation();
     });
 
-    // 6. Setup listener (jangan langsung ubah textContent, animasikan kalau perlu)
+    // Setup listener (jangan langsung ubah textContent, animasikan kalau perlu)
     window.addEventListener("journals:changed", () => {
       const oldCount = this.currentArticles;
       this.updateArticleCount();
@@ -38,6 +38,38 @@ class StatisticsManager {
           this.currentArticles,
           600
         );
+      }
+    });
+
+    // Listen untuk perubahan opinions
+    window.addEventListener("opinions:changed", () => {
+      console.log("Opinions changed, updating article count...");
+      const oldCount = this.currentArticles;
+      this.updateArticleCount();
+      if (this.articleCountElement && this.currentArticles !== oldCount) {
+        this.animateCounter(
+          this.articleCountElement,
+          oldCount,
+          this.currentArticles,
+          600
+        );
+      }
+    });
+
+    // Listen untuk storage changes (opinions)
+    window.addEventListener("storage", (e) => {
+      if (e.key === "opinions") {
+        console.log("Storage opinions changed, updating article count...");
+        const oldCount = this.currentArticles;
+        this.updateArticleCount();
+        if (this.articleCountElement && this.currentArticles !== oldCount) {
+          this.animateCounter(
+            this.articleCountElement,
+            oldCount,
+            this.currentArticles,
+            600
+          );
+        }
       }
     });
 
@@ -68,9 +100,6 @@ class StatisticsManager {
         }
       }
     });
-
-    // 7. HAPUS atau disable setupPeriodicUpdates kalau tidak diperlukan
-    // this.setupPeriodicUpdates(); // <-- DISABLE INI untuk menghindari loncatan acak
   }
 
   loadStatistics() {
@@ -135,8 +164,18 @@ class StatisticsManager {
 
   updateArticleCount() {
     try {
-      const list = JSON.parse(localStorage.getItem("journals") || "[]");
-      this.currentArticles = Array.isArray(list) ? list.length : 0;
+      const journals = JSON.parse(localStorage.getItem("journals") || "[]");
+      const opinions = JSON.parse(localStorage.getItem("opinions") || "[]");
+
+      // Hitung total (jurnal + opini)
+      const journalsCount = Array.isArray(journals) ? journals.length : 0;
+      const opinionsCount = Array.isArray(opinions) ? opinions.length : 0;
+
+      this.currentArticles = journalsCount + opinionsCount;
+
+      console.log(
+        `📊 Article count: ${journalsCount} journals + ${opinionsCount} opinions = ${this.currentArticles} total`
+      );
     } catch {
       this.currentArticles = 0;
     }

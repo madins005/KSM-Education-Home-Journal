@@ -5,7 +5,7 @@ class LoginManager {
     this.loginModal = document.getElementById("loginModal");
     this.loginForm = document.getElementById("loginForm");
 
-    // Support multiple button locations (index.html & journals.html)
+    // Support multiple button locations (dashboard_admin.html & journals.html)
     this.loginBtn = document.querySelector(".btn-register");
 
     this.closeModalBtn = document.getElementById("closeLoginModal");

@@ -6,7 +6,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   background: #f5f5f5;
   color: #333;
   line-height: 1.6;
@@ -72,6 +72,85 @@ nav a:hover {
 nav a.active {
   color: #2c3e50;
   font-weight: 600;
+}
+
+nav a.active:hover {
+  color: white;
+}
+
+/* ===== NAV DROPDOWN ===== */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-link.has-caret {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.nav-link.has-caret::after {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(-45deg);
+  margin-top: 2px;
+  transition: transform 0.2s;
+}
+
+.nav-dropdown.open .nav-link.has-caret::after {
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
+.nav-dropdown .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 100;
+  margin-top: 8px;
+}
+
+.nav-dropdown.open .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-dropdown .dropdown-menu a {
+  display: block;
+  padding: 12px 16px;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.nav-dropdown .dropdown-menu a:hover {
+  background: #f5f5f5;
+  color: #2c3e50;
+}
+
+.nav-dropdown .dropdown-menu a:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+.nav-dropdown .dropdown-menu a:last-child {
+  border-radius: 0 0 6px 6px;
 }
 
 /* ===== AUTH SECTION ===== */
@@ -145,7 +224,7 @@ nav a.active {
 }
 
 /* ===== DROPDOWN MENU ===== */
-.dropdown-menu {
+.user-profile .dropdown-menu {
   position: absolute;
   top: 100%;
   right: 0;
@@ -160,7 +239,7 @@ nav a.active {
   overflow: hidden;
 }
 
-.dropdown-menu.show {
+.user-profile .dropdown-menu.show {
   display: block;
   animation: slideDown 0.3s ease;
 }
@@ -437,7 +516,7 @@ nav a.active {
   background: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 14px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   transition: all 0.3s;
 }
 
@@ -461,7 +540,7 @@ nav a.active {
   font-weight: 700;
   transition: all 0.3s;
   font-size: 14px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
