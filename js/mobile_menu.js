@@ -2,7 +2,7 @@
  * RESPONSIVE.JS - KSM EDUCATION
  * Mobile Menu & Responsive Functionality
  * 
- * Tambahkan file ini ke index.html dengan:
+ * Tambahkan file ini ke dashbaord_admin.html dengan:
  * <script src="./js/responsive.js"></script>
  */
 
