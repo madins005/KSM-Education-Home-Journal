@@ -164,9 +164,9 @@ function setUserName() {
   }
 }
 
-if (sessionStorage.getItem("userLoggedIn") !== "true") {
-  window.location.href = "./login_user.html";
-}
+// if (sessionStorage.getItem("userLoggedIn") !== "true") {
+//   window.location.href = "./login_user.html";
+// }
 
 document.addEventListener("DOMContentLoaded", () => {
   setupNavDropdown();
