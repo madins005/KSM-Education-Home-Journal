@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+    <link rel="stylesheet" href="./styles/explore_jurnal_user.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detail Artikel - KSM Education</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
+    <link rel="stylesheet" href="explore_jurnal_user.css" />
+    <script src="https://unpkg.com/feather-icons"></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <div class="header-container">
+        <div class="logo">
+          <a href="dashboard_user.html">
+            <img src="./assets/main_logo.png" alt="Logo" />
+          </a>
+        </div>
+        <nav>
+          <a href="dashboard_user.html">HOME</a>
+          <div class="nav-dropdown">
+            <a href="#" class="nav-link">
+              ARTIKEL
+              <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </a>
+            <div class="dropdown-menu">
+              <a href="./journals_user.html">Artikel Jurnal</a>
+              <a href="./opinions_user.html">Artikel Opini</a>
+            </div>
+          </div>
+        </nav>
+        <div class="auth-section">
+          <div class="search-box">
+            <i data-feather="search"></i>
+            <input type="text" placeholder="cari artikel..." />
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Loading State -->
+      <div id="loadingState" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Memuat artikel...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="error-message" style="display: none;">
+        <i data-feather="alert-circle"></i>
+        <h3>Artikel tidak ditemukan</h3>
+        <p>Artikel yang Anda cari tidak tersedia atau telah dihapus.</p>
+      </div>
+
+      <!-- Article Detail -->
+      <div id="articleDetail" class="article-detail" style="display: none;">
+        <!-- Article Type Badge -->
+        <div style="padding: 1.5rem 2rem 0;">
+          <span id="articleBadge" class="article-badge">
+            <i data-feather="book-open"></i>
+            <span id="badgeText">Artikel Jurnal</span>
+          </span>
+        </div>
+
+        <!-- Article Header -->
+        <div class="article-header">
+          <h1 class="article-title" id="articleTitle">-</h1>
+          <div class="article-meta">
+            <div class="meta-item">
+              <i data-feather="calendar"></i>
+              <span id="articleDate">-</span>
+            </div>
+            <div class="meta-item">
+              <i data-feather="eye"></i>
+              <span id="articleViews">0 views</span>
+            </div>
+            <div class="meta-item">
+              <i data-feather="clock"></i>
+              <span id="readTime">5 min read</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cover Image -->
+        <img id="articleCover" class="article-cover" style="display: none;" />
+
+        <!-- Article Content -->
+        <div class="article-content">
+          <!-- Abstract Section -->
+          <div class="content-section">
+            <h3>
+              <i data-feather="file-text"></i>
+              <span id="abstractTitle">Abstrak</span>
+            </h3>
+            <div class="abstract-box">
+              <p id="articleAbstract">-</p>
+            </div>
+          </div>
+
+          <!-- Main Article Body -->
+          <div class="content-section" id="articleBodySection">
+            <h3>
+              <i data-feather="align-left"></i>
+              Isi Artikel
+            </h3>
+            <div class="article-body" id="articleBody">
+              <!-- Dynamic content will be inserted here -->
+            </div>
+          </div>
+
+          <div class="content-divider"></div>
+
+          <!-- Tags Section -->
+          <div class="content-section" id="tagsSection" style="display: none;">
+            <h3>
+              <i data-feather="tag"></i>
+              Kata Kunci
+            </h3>
+            <div class="tags-container" id="articleTags"></div>
+          </div>
+
+          <!-- Authors Section -->
+          <div class="content-section">
+            <h3>
+              <i data-feather="users"></i>
+              Penulis
+            </h3>
+            <div class="authors-list" id="articleAuthors"></div>
+          </div>
+
+          <!-- Pengurus Section -->
+          <div class="content-section" id="pengurusSection" style="display: none;">
+            <h3>
+              <i data-feather="briefcase"></i>
+              Pengurus
+            </h3>
+            <div class="authors-list" id="articlePengurus"></div>
+          </div>
+
+          <!-- Contact Section -->
+          <div class="content-section">
+            <h3>
+              <i data-feather="phone"></i>
+              Informasi Kontak
+            </h3>
+            <div class="contact-info">
+              <div class="contact-item">
+                <i data-feather="mail"></i>
+                <a href="#" id="articleEmail">-</a>
+              </div>
+              <div class="contact-item">
+                <i data-feather="phone"></i>
+                <span id="articlePhone">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-divider"></div>
+
+          <!-- PDF Section -->
+          <div class="content-section" id="pdfSection">
+            <div class="pdf-section">
+              <h3 style="margin-bottom: 0.5rem;">
+                <i data-feather="file"></i>
+                Dokumen Lengkap
+              </h3>
+              <p style="color: #666; margin-bottom: 1rem;">Download atau lihat dokumen lengkap dalam format PDF</p>
+              
+              <div class="pdf-actions">
+                <a href="#" id="pdfDownload" class="btn-pdf btn-download" download>
+                  <i data-feather="download"></i>
+                  Download PDF
+                </a>
+                <button id="togglePdfViewer" class="btn-pdf btn-view">
+                  <i data-feather="eye"></i>
+                  <span id="viewerToggleText">Lihat PDF</span>
+                </button>
+              </div>
+
+              <div class="pdf-viewer" id="pdfViewer" style="display: none;">
+                <iframe id="pdfIframe"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="explore_jurnal_user.js"></script>
+  </body>
+</html>
