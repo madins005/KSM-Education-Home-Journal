@@ -1,7 +1,6 @@
 /* ========================================
-   RESPONSIVE.CSS - KSM EDUCATION
-   Tambahkan file ini ke dashbaord_admin.html dengan:
-   
+   RESPONSIVE.CSS - DASHBOARD ADMIN
+   KSM EDUCATION
    ======================================== */
 
 /* Hamburger Menu Button */
@@ -14,6 +13,7 @@
   cursor: pointer;
   padding: 8px;
   z-index: 1001;
+  transition: all 0.3s ease;
 }
 
 .hamburger-menu span {
@@ -62,16 +62,14 @@ body.menu-open {
 }
 
 /* ========================================
-   RESPONSIVE BREAKPOINTS
+   TABLET & MOBILE (768px and below)
    ======================================== */
-
-/* Tablet & Mobile (768px and below) */
 @media (max-width: 768px) {
-  /* Header adjustments */
+  /* Header */
   .header-container {
     padding: 1rem;
     flex-wrap: wrap;
-    position: relative;
+    gap: 1rem;
   }
 
   .logo {
@@ -80,30 +78,31 @@ body.menu-open {
   }
 
   .logo img {
-    height: 40px;
+    width: 60px;
+    height: auto;
   }
 
-  /* Show hamburger menu */
+  /* Show hamburger */
   .hamburger-menu {
     display: flex;
-    order: 3;
+    order: 2;
     margin-left: auto;
   }
 
-  /* Navigation transforms to mobile menu */
+  /* Mobile Navigation */
   nav {
     position: fixed !important;
     top: 0 !important;
     left: -100% !important;
     width: 80% !important;
-    max-width: 300px !important;
+    max-width: 320px !important;
     height: 100vh !important;
     background: white !important;
     flex-direction: column !important;
     padding: 80px 0 2rem 0 !important;
     gap: 0 !important;
     transition: left 0.3s ease !important;
-    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2) !important;
     z-index: 1000 !important;
     overflow-y: auto !important;
     display: flex !important;
@@ -114,26 +113,48 @@ body.menu-open {
   }
 
   nav a {
-    font-size: 16px !important;
-    padding: 1rem 2rem !important;
+    font-size: 15px !important;
+    padding: 1rem 1.5rem !important;
     border-bottom: 1px solid #f0f0f0 !important;
     width: 100% !important;
     display: block !important;
     text-align: left !important;
+    border-radius: 0 !important;
   }
 
-  /* Dropdown adjustments for mobile */
+  nav a:hover {
+    background: #f5f5f5 !important;
+  }
+
+  /* Dropdown Mobile */
   .nav-dropdown {
     width: 100% !important;
+    position: static !important;
   }
 
   .nav-link.has-caret {
     width: 100% !important;
-    padding: 1rem 2rem !important;
+    padding: 1rem 1.5rem !important;
     justify-content: space-between !important;
     text-align: left !important;
     border-bottom: 1px solid #f0f0f0 !important;
-    font-size: 16px !important;
+    font-size: 15px !important;
+    border-radius: 0 !important;
+    color: #666 !important;
+    font-weight: 500 !important;
+  }
+
+  .nav-link.has-caret:hover {
+    background: #f5f5f5 !important;
+    color: #2c3e50 !important;
+  }
+
+  .nav-link.has-caret .caret {
+    transition: transform 0.3s ease;
+  }
+
+  .nav-dropdown.active .nav-link.has-caret .caret {
+    transform: rotate(180deg);
   }
 
   .dropdown-menu {
@@ -146,6 +167,8 @@ body.menu-open {
     background: #f8f9fa !important;
     padding: 0 !important;
     min-width: 100% !important;
+    border: none !important;
+    margin: 0 !important;
   }
 
   .nav-dropdown.active .dropdown-menu {
@@ -153,45 +176,58 @@ body.menu-open {
   }
 
   .dropdown-menu a {
-    padding: 0.75rem 3rem !important;
+    padding: 0.75rem 2.5rem !important;
     font-size: 14px !important;
     background: #f8f9fa !important;
+    border-bottom: 1px solid #e9ecef !important;
   }
 
   .dropdown-menu a:hover {
     background: #e9ecef !important;
+    color: #2c3e50 !important;
   }
 
-  /* Auth section adjustments */
+  /* Auth Section */
   .auth-section {
-    order: 2;
+    order: 3;
     width: 100%;
-    margin-top: 1rem;
-    flex-direction: column;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 
   .btn-user-login,
   .btn-register {
-    width: 100%;
+    flex: 1;
+    min-width: 120px;
     justify-content: center;
-    padding: 12px 20px;
+    padding: 10px 16px;
+    font-size: 13px;
   }
 
   .search-box {
     width: 100%;
+    order: 4;
   }
 
   .search-box input {
     width: 100%;
   }
 
-  /* Container adjustments */
+  /* Container */
   .container {
     padding: 1rem;
   }
 
-  /* Statistics grid */
+  /* Statistics */
+  .statistics {
+    padding: 1.5rem 1rem;
+  }
+
+  .statistics h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -201,22 +237,61 @@ body.menu-open {
     padding: 1.5rem;
   }
 
-  /* Journal list & sections */
-  .journal-list,
-  .upload-section,
-  .statistics {
-    padding: 1.5rem;
+  .stat-number {
+    font-size: 2rem;
   }
 
-  section h2 {
-    font-size: 22px;
+  .stat-label {
+    font-size: 0.9rem;
   }
 
-  section h3 {
-    font-size: 18px;
+  /* Journal List */
+  .journal-list {
+    padding: 1.5rem 1rem;
   }
 
-  /* Form adjustments */
+  .journal-list h2 {
+    font-size: 1.5rem;
+  }
+
+  .journal-card {
+    padding: 1rem;
+  }
+
+  .journal-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .journal-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Upload Section */
+  .upload-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .upload-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .upload-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .upload-tab {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Upload Form */
+  .upload-form-container {
+    padding: 1.5rem 1rem;
+  }
+
   .drop-zone,
   .cover-drop-zone {
     padding: 2rem 1rem;
@@ -232,14 +307,79 @@ body.menu-open {
   }
 
   .upload-subtext {
-    font-size: 13px;
+    font-size: 12px;
   }
 
-  /* Modal adjustments */
+  /* Form Groups */
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 12px;
+  }
+
+  /* Author/Pengurus Groups */
+  .author-input-group,
+  .pengurus-input-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .author-input,
+  .pengurus-input {
+    width: 100%;
+  }
+
+  .btn-remove-author,
+  .btn-remove-pengurus {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-add-author,
+  .btn-secondary {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  /* Tags */
+  .tags-input-group > div {
+    flex-direction: column;
+  }
+
+  #tagsInputJurnal,
+  #tagsInputOpini {
+    width: 100%;
+  }
+
+  #addTagBtnJurnal,
+  #addTagBtnOpini {
+    width: 100%;
+  }
+
+  /* Buttons */
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  /* Modals */
   .modal-content {
     width: 95%;
     max-width: 95%;
     margin: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .login-container,
@@ -248,61 +388,27 @@ body.menu-open {
     padding: 1.5rem;
   }
 
-  /* Form groups */
-  .form-group input,
-  .form-group textarea {
-    font-size: 16px; /* Prevent zoom on iOS */
-    padding: 12px;
+  .login-header h2,
+  .edit-header h2,
+  .preview-header h3 {
+    font-size: 1.5rem;
   }
 
-  .form-group label {
-    font-size: 14px;
+  .login-logo {
+    max-width: 100px;
   }
 
-  /* Author input groups */
-  .author-input-group {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .btn-remove-author {
-    width: 100%;
-  }
-
-  .btn-add-author {
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* Buttons */
-  .btn-submit,
-  .btn-login,
-  .btn-save {
-    padding: 14px;
-    font-size: 16px;
-  }
-
-  /* Journal cards */
-  .journal-card {
-    padding: 1rem;
-  }
-
-  .journal-item {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  /* Edit actions */
+  /* Edit Actions */
   .edit-actions {
     flex-direction: column;
-    gap: 10px;
+    gap: 0.75rem;
   }
 
   .edit-actions button {
     width: 100%;
   }
 
-  /* File preview */
+  /* File Preview */
   .file-preview {
     padding: 1rem;
   }
@@ -310,9 +416,18 @@ body.menu-open {
   .file-info {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.75rem;
   }
 
-  /* Cover preview */
+  .file-details {
+    width: 100%;
+  }
+
+  .remove-file-btn {
+    width: 100%;
+  }
+
+  /* Cover Preview */
   .cover-preview {
     max-width: 100%;
   }
@@ -320,72 +435,104 @@ body.menu-open {
   .cover-preview img {
     max-height: 250px;
   }
+
+  /* View All Button */
+  .btn-view-all {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
 }
 
-/* Small Mobile (480px and below) */
+/* ========================================
+   SMALL MOBILE (480px and below)
+   ======================================== */
 @media (max-width: 480px) {
+  /* Header */
   .header-container {
     padding: 0.75rem;
   }
 
   .logo img {
-    height: 35px;
+    width: 50px;
   }
 
+  /* Typography */
   h2 {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
 
   h3 {
-    font-size: 16px;
+    font-size: 1.1rem;
   }
 
+  /* Statistics */
   .stat-number {
-    font-size: 28px;
+    font-size: 1.75rem;
   }
 
   .stat-label {
-    font-size: 13px;
+    font-size: 0.85rem;
   }
 
   .stat-icon svg,
   .stat-icon i {
-    font-size: 36px;
     width: 36px;
     height: 36px;
   }
 
+  /* Navigation */
   nav {
     width: 85% !important;
   }
 
+  nav a {
+    font-size: 14px !important;
+    padding: 0.875rem 1.25rem !important;
+  }
+
+  /* Auth Buttons */
   .btn-user-login,
   .btn-register {
     font-size: 12px;
-    padding: 10px 16px;
+    padding: 8px 12px;
   }
 
+  /* Form Elements */
+  .form-group input,
+  .form-group textarea {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  /* Modals */
   .modal-content {
-    width: 100%;
     margin: 0.5rem;
     border-radius: 8px;
   }
 
+  /* Upload Areas */
   .drop-zone,
   .cover-drop-zone {
     padding: 1.5rem 0.75rem;
   }
 
-  .form-group {
-    margin-bottom: 1rem;
+  .upload-icon svg {
+    width: 40px;
+    height: 40px;
   }
 
-  .login-logo {
-    max-width: 120px;
+  .upload-text {
+    font-size: 13px;
+  }
+
+  .upload-subtext {
+    font-size: 11px;
   }
 }
 
-/* Landscape mobile */
+/* ========================================
+   LANDSCAPE MOBILE
+   ======================================== */
 @media (max-height: 500px) and (orientation: landscape) {
   nav {
     padding-top: 60px !important;
@@ -393,7 +540,7 @@ body.menu-open {
 
   nav a,
   .nav-link.has-caret {
-    padding: 0.75rem 2rem !important;
+    padding: 0.75rem 1.5rem !important;
   }
 
   .modal-content {
@@ -402,14 +549,16 @@ body.menu-open {
   }
 }
 
-/* Very small devices */
+/* ========================================
+   VERY SMALL DEVICES (360px and below)
+   ======================================== */
 @media (max-width: 360px) {
   .header-container {
     padding: 0.5rem;
   }
 
   .logo img {
-    height: 30px;
+    width: 45px;
   }
 
   .hamburger-menu span {
@@ -419,11 +568,21 @@ body.menu-open {
   .btn-user-login,
   .btn-register {
     font-size: 11px;
-    padding: 8px 12px;
+    padding: 7px 10px;
+    min-width: 100px;
   }
 
-  section h2 {
-    font-size: 18px;
+  h2 {
+    font-size: 1.125rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  .upload-tab {
+    font-size: 13px;
+    padding: 10px 12px;
   }
 }
 
@@ -446,5 +605,40 @@ body.menu-open {
 @media (max-width: 768px) {
   .show-mobile {
     display: block !important;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+/* Focus styles for keyboard navigation */
+@media (max-width: 768px) {
+  .hamburger-menu:focus {
+    outline: 2px solid #2c5f7d;
+    outline-offset: 2px;
+  }
+
+  nav a:focus,
+  .nav-link.has-caret:focus {
+    outline: 2px solid #2c5f7d;
+    outline-offset: -2px;
+  }
+}
+
+/* Smooth transitions */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent iOS input zoom */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important;
   }
 }

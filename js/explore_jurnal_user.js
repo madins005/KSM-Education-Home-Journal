@@ -1,36 +1,163 @@
-// Initialize Feather Icons
+// Initialize Feather Icons immediately
 feather.replace();
 
-// ===== DROPDOWN FUNCTIONALITY =====
-// Handle dropdown click (bukan hover)
-document.addEventListener('DOMContentLoaded', function() {
-  const navDropdown = document.querySelector('.nav-dropdown');
-  const navLink = document.querySelector('.nav-link');
+// ===== SETUP NAV DROPDOWN (sama seperti dashboard_user.js) =====
+function setupNavDropdown() {
+  document.querySelectorAll(".nav-dropdown").forEach((dd) => {
+    const btn = dd.querySelector(".nav-link.has-caret");
+    const menu = dd.querySelector(".dropdown-menu");
 
-  // Toggle dropdown on click
-  navLink.addEventListener('click', function(e) {
-    e.preventDefault();
-    navDropdown.classList.toggle('open');
+    if (!btn || !menu) return;
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Close other dropdowns
+      document.querySelectorAll(".nav-dropdown.open").forEach((x) => {
+        if (x !== dd) x.classList.remove("open");
+      });
+      
+      // Toggle current dropdown
+      dd.classList.toggle("open");
+    });
   });
 
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function(e) {
-    if (!navDropdown.contains(e.target)) {
-      navDropdown.classList.remove('open');
+  // Close all dropdowns when clicking outside
+  document.addEventListener("click", () => {
+    document
+      .querySelectorAll(".nav-dropdown.open")
+      .forEach((x) => x.classList.remove("open"));
+  });
+}
+
+// ===== SEARCH FUNCTIONALITY =====
+const searchInput = document.getElementById('searchInput');
+const searchModal = document.getElementById('searchModal');
+const closeSearchModal = document.getElementById('closeSearchModal');
+const searchResults = document.getElementById('searchResults');
+
+let searchTimeout;
+
+if (searchInput) {
+  // Search as user types
+  searchInput.addEventListener('input', function(e) {
+    const query = e.target.value.trim();
+    
+    // Clear previous timeout
+    clearTimeout(searchTimeout);
+    
+    // Wait 300ms after user stops typing
+    searchTimeout = setTimeout(() => {
+      if (query.length >= 2) {
+        performSearch(query);
+        searchModal.style.display = 'flex';
+      } else {
+        searchModal.style.display = 'none';
+      }
+    }, 300);
+  });
+}
+
+if (closeSearchModal) {
+  // Close modal
+  closeSearchModal.addEventListener('click', function() {
+    searchModal.style.display = 'none';
+  });
+}
+
+if (searchModal) {
+  // Close modal when clicking outside
+  searchModal.addEventListener('click', function(e) {
+    if (e.target === searchModal) {
+      searchModal.style.display = 'none';
     }
   });
+}
 
-  // Prevent dropdown from closing when clicking inside
-  navDropdown.addEventListener('click', function(e) {
-    e.stopPropagation();
+// Perform search
+function performSearch(query) {
+  const journals = JSON.parse(localStorage.getItem('journals') || '[]');
+  const opinions = JSON.parse(localStorage.getItem('opinions') || '[]');
+  
+  // Combine and search
+  const allArticles = [
+    ...journals.map(j => ({...j, type: 'jurnal'})),
+    ...opinions.map(o => ({...o, type: 'opini'}))
+  ];
+  
+  const results = allArticles.filter(article => {
+    const title = (article.title || article.judul || '').toLowerCase();
+    const abstract = (article.abstract || article.abstrak || '').toLowerCase();
+    const authors = (article.authors || [article.author || article.penulis] || []).join(' ').toLowerCase();
+    const tags = (article.tags || []).join(' ').toLowerCase();
+    
+    const searchQuery = query.toLowerCase();
+    
+    return title.includes(searchQuery) || 
+           abstract.includes(searchQuery) || 
+           authors.includes(searchQuery) ||
+           tags.includes(searchQuery);
   });
-});
+  
+  displaySearchResults(results, query);
+}
+
+// Display search results
+function displaySearchResults(results, query) {
+  if (results.length === 0) {
+    searchResults.innerHTML = `
+      <div class="no-results">
+        <i data-feather="search"></i>
+        <h3>Tidak ada hasil ditemukan</h3>
+        <p>Tidak ada artikel yang cocok dengan pencarian "${query}"</p>
+      </div>
+    `;
+    feather.replace();
+    return;
+  }
+  
+  searchResults.innerHTML = results.map(article => {
+    const title = article.title || article.judul;
+    const abstract = article.abstract || article.abstrak || '';
+    const date = new Date(article.date || article.uploadDate).toLocaleDateString('id-ID', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    const views = article.views || 0;
+    const author = article.authors ? article.authors[0] : (article.author || article.penulis);
+    
+    return `
+      <div class="search-result-item" onclick="goToArticle('${article.id}', '${article.type}')">
+        <span class="search-result-type result-type-${article.type}">
+          <i data-feather="${article.type === 'jurnal' ? 'book-open' : 'edit-3'}"></i>
+          ${article.type === 'jurnal' ? 'Jurnal' : 'Opini'}
+        </span>
+        <div class="search-result-title">${title}</div>
+        <div class="search-result-abstract">${abstract}</div>
+        <div class="search-result-meta">
+          <span><i data-feather="calendar"></i> ${date}</span>
+          <span><i data-feather="user"></i> ${author}</span>
+          <span><i data-feather="eye"></i> ${views} views</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  feather.replace();
+}
+
+// Navigate to article
+function goToArticle(id, type) {
+  window.location.href = `explore_jurnal_user.html?id=${id}&type=${type}`;
+}
 
 // ===== ARTICLE LOADING FUNCTIONALITY =====
 // Get article ID and type from URL
 const urlParams = new URLSearchParams(window.location.search);
 const articleId = urlParams.get('id');
-const articleType = urlParams.get('type') || 'jurnal'; // 'jurnal' or 'opini'
+const articleType = urlParams.get('type') || 'jurnal';
 
 // Load article data
 async function loadArticleDetail() {
@@ -40,7 +167,6 @@ async function loadArticleDetail() {
   }
 
   try {
-    // Get article data from localStorage based on type
     const storageKey = articleType === 'opini' ? 'opinions' : 'journals';
     const articles = JSON.parse(localStorage.getItem(storageKey) || '[]');
     const article = articles.find(a => a.id === articleId);
@@ -50,10 +176,7 @@ async function loadArticleDetail() {
       return;
     }
 
-    // Display article data
     displayArticle(article, articleType);
-    
-    // Update view count
     updateViewCount(articleId, storageKey);
     
   } catch (error) {
@@ -95,7 +218,7 @@ function displayArticle(article, type) {
   // Views
   document.getElementById('articleViews').textContent = `${article.views || 0} views`;
 
-  // Estimate read time based on abstract length
+  // Estimate read time
   const wordCount = (article.abstract || article.abstrak || '').split(' ').length;
   const readTime = Math.max(2, Math.ceil(wordCount / 200));
   document.getElementById('readTime').textContent = `${readTime} min read`;
@@ -110,16 +233,12 @@ function displayArticle(article, type) {
   // Abstract
   document.getElementById('articleAbstract').textContent = article.abstract || article.abstrak || '-';
 
-  // Article Body (if available)
+  // Article Body
   if (article.content || article.body) {
     document.getElementById('articleBodySection').style.display = 'block';
     const bodyContent = article.content || article.body;
-    
-    // Parse HTML content safely
-    const articleBody = document.getElementById('articleBody');
-    articleBody.innerHTML = bodyContent;
+    document.getElementById('articleBody').innerHTML = bodyContent;
   } else {
-    // Hide body section if no content
     document.getElementById('articleBodySection').style.display = 'none';
   }
 
@@ -180,7 +299,6 @@ function displayArticle(article, type) {
     document.getElementById('pdfSection').style.display = 'none';
   }
 
-  // Re-initialize Feather Icons for dynamically added content
   feather.replace();
 }
 
@@ -205,19 +323,26 @@ function updateViewCount(articleId, storageKey) {
 }
 
 // ===== PDF VIEWER TOGGLE =====
-document.getElementById('togglePdfViewer').addEventListener('click', function() {
-  const viewer = document.getElementById('pdfViewer');
-  const toggleText = document.getElementById('viewerToggleText');
-  
-  if (viewer.style.display === 'none') {
-    viewer.style.display = 'block';
-    toggleText.textContent = 'Tutup PDF';
-    this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  } else {
-    viewer.style.display = 'none';
-    toggleText.textContent = 'Lihat PDF';
-  }
-});
+const togglePdfBtn = document.getElementById('togglePdfViewer');
+if (togglePdfBtn) {
+  togglePdfBtn.addEventListener('click', function() {
+    const viewer = document.getElementById('pdfViewer');
+    const toggleText = document.getElementById('viewerToggleText');
+    
+    if (viewer.style.display === 'none') {
+      viewer.style.display = 'block';
+      toggleText.textContent = 'Tutup PDF';
+      this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      viewer.style.display = 'none';
+      toggleText.textContent = 'Lihat PDF';
+    }
+  });
+}
 
-// ===== LOAD ARTICLE ON PAGE LOAD =====
-window.addEventListener('DOMContentLoaded', loadArticleDetail);
+// ===== LOAD ON PAGE READY =====
+document.addEventListener('DOMContentLoaded', () => {
+  setupNavDropdown();
+  loadArticleDetail();
+  feather.replace();
+});

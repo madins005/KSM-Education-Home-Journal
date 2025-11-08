@@ -1,12 +1,12 @@
 /**
- * RESPONSIVE.JS - KSM EDUCATION
- * Mobile Menu & Responsive Functionality
- * 
- * Tambahkan file ini ke dashbaord_admin.html dengan:
- * <script src="./js/responsive.js"></script>
+ * RESPONSIVE_ADMIN.JS
+ * Mobile Menu & Responsive Functionality for Dashboard Admin
+ * KSM EDUCATION
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('Initializing responsive menu...');
+  
   // Get elements
   const header = document.querySelector('.header-container');
   const nav = document.querySelector('nav');
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const hamburger = document.createElement('button');
   hamburger.className = 'hamburger-menu';
   hamburger.setAttribute('aria-label', 'Toggle menu');
+  hamburger.setAttribute('aria-expanded', 'false');
   hamburger.setAttribute('type', 'button');
   hamburger.innerHTML = '<span></span><span></span><span></span>';
   
@@ -43,18 +44,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const isActive = hamburger.classList.contains('active');
     
     if (isActive) {
-      // Close menu
-      hamburger.classList.remove('active');
-      nav.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.classList.remove('menu-open');
+      closeMenu();
     } else {
-      // Open menu
-      hamburger.classList.add('active');
-      nav.classList.add('active');
-      overlay.classList.add('active');
-      document.body.classList.add('menu-open');
+      openMenu();
     }
+  }
+  
+  /**
+   * Open mobile menu
+   */
+  function openMenu() {
+    hamburger.classList.add('active');
+    hamburger.setAttribute('aria-expanded', 'true');
+    nav.classList.add('active');
+    overlay.classList.add('active');
+    document.body.classList.add('menu-open');
   }
   
   /**
@@ -62,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function closeMenu() {
     hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
     nav.classList.remove('active');
     overlay.classList.remove('active');
     document.body.classList.remove('menu-open');
@@ -87,9 +92,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle navigation links - close menu when clicked
   const navLinks = document.querySelectorAll('nav > a');
   navLinks.forEach(function(link) {
-    link.addEventListener('click', function() {
+    link.addEventListener('click', function(e) {
       if (window.innerWidth <= 768) {
-        closeMenu();
+        // Check if it's an anchor link
+        const href = this.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          closeMenu();
+        }
       }
     });
   });
@@ -104,11 +113,16 @@ document.addEventListener('DOMContentLoaded', function() {
       if (window.innerWidth <= 768) {
         e.preventDefault();
         e.stopPropagation();
+        
+        const isActive = dropdown.classList.contains('active');
         dropdown.classList.toggle('active');
+        
+        // Update aria-expanded
+        this.setAttribute('aria-expanded', !isActive);
       }
     });
     
-    // Close dropdown when clicking dropdown links
+    // Close dropdown and menu when clicking dropdown links
     const dropdownLinks = dropdown.querySelectorAll('.dropdown-menu a');
     dropdownLinks.forEach(function(link) {
       link.addEventListener('click', function() {
@@ -135,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
     e.stopPropagation();
   });
   
-  // Close menu when clicking outside (on desktop this won't trigger due to overlay)
+  // Close menu when clicking outside
   document.addEventListener('click', function(e) {
     if (window.innerWidth <= 768) {
       const isClickInsideNav = nav.contains(e.target);
@@ -154,14 +168,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Optional: Add smooth scroll for anchor links
+  // Handle smooth scroll for anchor links
   const anchorLinks = document.querySelectorAll('a[href^="#"]');
   anchorLinks.forEach(function(link) {
     link.addEventListener('click', function(e) {
       const href = this.getAttribute('href');
       
       // Skip if it's just "#" or modal trigger
-      if (href === '#' || href.includes('Modal')) {
+      if (href === '#' || href.includes('Modal') || href.includes('modal')) {
         return;
       }
       
@@ -181,5 +195,28 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  console.log('✅ Responsive menu initialized');
+  // Prevent dropdown from auto-closing on desktop
+  if (window.innerWidth > 768) {
+    const dropdownBtn = document.querySelector('.nav-dropdown .nav-link.has-caret');
+    if (dropdownBtn) {
+      dropdownBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const dropdown = this.closest('.nav-dropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('open');
+        }
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function() {
+        const openDropdown = document.querySelector('.nav-dropdown.open');
+        if (openDropdown) {
+          openDropdown.classList.remove('open');
+        }
+      });
+    }
+  }
+  
+  console.log('✅ Responsive menu initialized successfully');
 });
