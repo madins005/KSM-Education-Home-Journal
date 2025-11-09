@@ -1,75 +1,38 @@
-function setupNavDropdown() {
-  document.querySelectorAll(".nav-dropdown").forEach((dd) => {
-    const btn = dd.querySelector(".nav-link.has-caret");
-    const menu = dd.querySelector(".dropdown-menu");
-
-    if (!btn || !menu) return;
-
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      document.querySelectorAll(".nav-dropdown.open").forEach((x) => {
-        if (x !== dd) x.classList.remove("open");
-      });
-      dd.classList.toggle("open");
-    });
-  });
-
-  document.addEventListener("click", () => {
-    document
-      .querySelectorAll(".nav-dropdown.open")
-      .forEach((x) => x.classList.remove("open"));
-  });
-}
-
-class DropdownManager {
-  constructor() {
-    this.userProfile = document.getElementById("userProfile");
-    this.dropdownMenu = document.getElementById("dropdownMenu");
-    this.init();
-  }
-
-  init() {
-    if (!this.userProfile || !this.dropdownMenu) return;
-
-    this.userProfile.addEventListener("click", (e) => {
-      e.stopPropagation();
-      this.toggleDropdown();
-    });
-
-    document.addEventListener("click", () => {
-      this.closeDropdown();
-    });
-
-    this.dropdownMenu.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-  }
-
-  toggleDropdown() {
-    this.dropdownMenu.classList.toggle("show");
-  }
-
-  closeDropdown() {
-    this.dropdownMenu.classList.remove("show");
-  }
-}
+// ===== DASHBOARD USER - FINAL VERSION =====
+// Pure user functions only - dropdowns handled by script.js
 
 feather.replace();
 
-// ===== CEK LOGIN STATUS =====
+// ===== LOGIN STATUS CHECK =====
 function checkLoginStatus() {
   return sessionStorage.getItem("userLoggedIn") === "true";
 }
 
+// ===== LOAD ARTICLES =====
 function loadArticles() {
   const journals = JSON.parse(localStorage.getItem("journals") || "[]");
   const opinions = JSON.parse(localStorage.getItem("opinions") || "[]");
-  return [...journals, ...opinions].sort((a, b) => b.id - a.id);
+  
+  // Add type to each article for navigation
+  const journalsWithType = journals.map(j => ({...j, type: 'jurnal'}));
+  const opinionsWithType = opinions.map(o => ({...o, type: 'opini'}));
+  
+  return [...journalsWithType, ...opinionsWithType].sort((a, b) => {
+    const dateA = new Date(a.uploadDate || a.date || 0);
+    const dateB = new Date(b.uploadDate || b.date || 0);
+    return dateB - dateA; // Newest first
+  });
 }
 
 let articles = loadArticles();
 
+// ===== NAVIGATE TO ARTICLE DETAIL =====
+function openArticleDetail(articleId, articleType) {
+  console.log('Opening article:', articleId, articleType);
+  window.location.href = `explore_jurnal_user.html?id=${articleId}&type=${articleType}`;
+}
+
+// ===== RENDER ARTICLES =====
 function renderArticles() {
   const grid = document.getElementById("articlesGrid");
   articles = loadArticles();
@@ -89,29 +52,58 @@ function renderArticles() {
 
   grid.innerHTML = articles
     .slice(0, 6)
-    .map(
-      (article) => `
-    <div class="article-card">
-      <div class="article-image-container">
-        <img src="${
-          article.coverImage ||
-          "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&h=400&fit=crop"
-        }" alt="${article.title}" class="article-image">
-      </div>
-      <div class="article-content">
-        <div class="article-meta">${
-          Array.isArray(article.author)
-            ? article.author.join(", ")
-            : article.author || "ADMIN"
-        } • ${article.date || new Date().toLocaleDateString("id-ID")}</div>
-        <div class="article-title">${article.title || "UNTITLED"}</div>
-      </div>
-    </div>
-  `
-    )
+    .map((article) => {
+      // Get article data (support both jurnal and opini formats)
+      const title = article.title || article.judul || "UNTITLED";
+      const author = Array.isArray(article.authors) 
+        ? article.authors[0] 
+        : (Array.isArray(article.author) 
+          ? article.author[0] 
+          : (article.author || article.penulis || "ADMIN"));
+      
+      const date = article.date || article.uploadDate || new Date().toISOString();
+      const formattedDate = new Date(date).toLocaleDateString("id-ID", {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      
+      const coverImage = article.coverImage || article.cover || 
+        "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&h=400&fit=crop";
+      
+      const views = article.views || 0;
+      const abstract = article.abstract || article.abstrak || "";
+      const truncatedAbstract = abstract.length > 100 
+        ? abstract.substring(0, 100) + "..." 
+        : abstract;
+      
+      const typeLabel = article.type === 'opini' ? 'OPINI' : 'JURNAL';
+      const typeClass = article.type === 'opini' ? 'badge-opini' : 'badge-jurnal';
+      
+      return `
+        <div class="article-card" onclick="openArticleDetail('${article.id}', '${article.type}')" style="cursor: pointer;">
+          <div class="article-image-container">
+            <img src="${coverImage}" alt="${title}" class="article-image">
+            <span class="article-type-badge ${typeClass}">${typeLabel}</span>
+          </div>
+          <div class="article-content">
+            <div class="article-meta">
+              <span><i data-feather="user" style="width: 14px; height: 14px;"></i> ${author}</span>
+              <span><i data-feather="calendar" style="width: 14px; height: 14px;"></i> ${formattedDate}</span>
+              <span><i data-feather="eye" style="width: 14px; height: 14px;"></i> ${views}</span>
+            </div>
+            <div class="article-title">${title}</div>
+            ${truncatedAbstract ? `<div class="article-excerpt">${truncatedAbstract}</div>` : ''}
+          </div>
+        </div>
+      `;
+    })
     .join("");
+  
+  feather.replace();
 }
 
+// ===== SYNC VISITOR COUNT =====
 function syncVisitorCount() {
   const oldVisitorKey = parseInt(localStorage.getItem("visitorCount") || "0");
   if (oldVisitorKey > 0) {
@@ -126,6 +118,7 @@ function syncVisitorCount() {
   }
 }
 
+// ===== LOGOUT HANDLER =====
 function setupLogout() {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
@@ -142,9 +135,11 @@ function setupLogout() {
   }
 }
 
+// ===== NEWSLETTER SUBSCRIPTION =====
 function setupNewsletter() {
   const subscribeBtn = document.getElementById("subscribeBtn");
   const newsletterEmail = document.getElementById("newsletterEmail");
+  
   if (subscribeBtn && newsletterEmail) {
     subscribeBtn.addEventListener("click", () => {
       const email = newsletterEmail.value.trim();
@@ -158,6 +153,7 @@ function setupNewsletter() {
   }
 }
 
+// ===== SET USER NAME =====
 function setUserName() {
   const userEmail = sessionStorage.getItem("userEmail");
   if (userEmail) {
@@ -169,11 +165,10 @@ function setUserName() {
   }
 }
 
-// ===== SETUP GUEST MODE =====
+// ===== GUEST MODE SETUP =====
 function setupGuestMode() {
   const isLoggedIn = checkLoginStatus();
 
-  // ELEMENT YANG CUMA MUNCUL UNTUK LOGGED IN USER
   const loggedInElements = [
     document.getElementById("userProfile"),
     document.getElementById("logoutBtn"),
@@ -186,7 +181,7 @@ function setupGuestMode() {
       if (el) el.style.display = "none";
     });
 
-    // TAMPILKAN LOGIN BUTTON DI NAVBAR
+    // Show login button in navbar
     const navbar = document.querySelector(".navbar");
     if (navbar && !document.getElementById("guestLoginBtn")) {
       const loginBtn = document.createElement("a");
@@ -202,7 +197,6 @@ function setupGuestMode() {
       navbar.appendChild(loginBtn);
     }
 
-    // SET AVATAR DEFAULT UNTUK GUEST
     const userNameEl = document.querySelector(".user-name");
     const userAvatarEl = document.querySelector(".user-avatar");
     if (userNameEl) userNameEl.textContent = "GUEST";
@@ -220,32 +214,12 @@ function setupGuestMode() {
   }
 }
 
-// HAPUS REDIRECT LOGIN REQUIREMENT
-// if (sessionStorage.getItem("userLoggedIn") !== "true") {
-//   window.location.href = "./login_user.html";
-// }
-
-document.addEventListener("DOMContentLoaded", () => {
-  setupNavDropdown();
-  window.dropdownManager = new DropdownManager();
-
-  syncVisitorCount();
-
-  if (typeof StatisticsManager !== "undefined" && !window.statsManager) {
-    window.statsManager = new StatisticsManager();
-  }
-
-  // SETUP GUEST MODE TERLEBIH DAHULU
-  setupGuestMode();
-  setupLogout();
-  setupNewsletter();
-
-  renderArticles();
-
-  // SYNC REAL-TIME SETIAP 5 DETIK
+// ===== REAL-TIME SYNC =====
+function startRealTimeSync() {
   setInterval(() => {
     const currentCount = articles.length;
     articles = loadArticles();
+    
     if (articles.length !== currentCount) {
       renderArticles();
       if (window.statsManager) {
@@ -253,6 +227,63 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   }, 5000);
+}
+
+// ===== SEARCH FUNCTIONALITY =====
+function setupSearch() {
+  const searchInput = document.querySelector('.search-box input');
+  
+  if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const query = searchInput.value.trim();
+        if (query) {
+          // Simple search - filter and show results
+          performSearch(query);
+        }
+      }
+    });
+  }
+}
+
+function performSearch(query) {
+  const articles = loadArticles();
+  const results = articles.filter(article => {
+    const title = (article.title || article.judul || '').toLowerCase();
+    const abstract = (article.abstract || article.abstrak || '').toLowerCase();
+    const author = Array.isArray(article.authors) 
+      ? article.authors.join(' ').toLowerCase()
+      : (article.author || article.penulis || '').toLowerCase();
+    
+    const searchQuery = query.toLowerCase();
+    return title.includes(searchQuery) || 
+           abstract.includes(searchQuery) || 
+           author.includes(searchQuery);
+  });
+  
+  // You can either redirect to journals page or show modal
+  // For now, let's redirect to journals page with search query
+  window.location.href = `journals_user.html?search=${encodeURIComponent(query)}`;
+}
+
+// ===== INITIALIZE USER DASHBOARD =====
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🏠 Initializing User Dashboard...");
+
+  syncVisitorCount();
+
+  if (typeof StatisticsManager !== "undefined" && !window.statsManager) {
+    window.statsManager = new StatisticsManager();
+  }
+
+  setupGuestMode();
+  setupLogout();
+  setupNewsletter();
+  setupSearch();
+  renderArticles();
+  startRealTimeSync();
 
   feather.replace();
+
+  console.log("✅ User Dashboard ready");
 });

@@ -1,3 +1,6 @@
+// ===== SCRIPT.JS - FIXED VERSION =====
+// Removed duplicate setupNavDropdown() - now using UnifiedDropdownManager
+
 // ===== Toast Helper (Global) =====
 function showToast(msg, type = "ok") {
   const t = document.getElementById("toast");
@@ -9,31 +12,6 @@ function showToast(msg, type = "ok") {
   window.__toastTimer__ = setTimeout(() => {
     t.style.display = "none";
   }, 2000);
-}
-
-// ===== Nav Dropdown Toggle =====
-function setupNavDropdown() {
-  document.querySelectorAll(".nav-dropdown").forEach((dd) => {
-    const btn = dd.querySelector(".nav-link.has-caret");
-    const menu = dd.querySelector(".dropdown-menu");
-
-    if (!btn || !menu) return;
-
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      document.querySelectorAll(".nav-dropdown.open").forEach((x) => {
-        if (x !== dd) x.classList.remove("open");
-      });
-      dd.classList.toggle("open");
-    });
-  });
-
-  document.addEventListener("click", () => {
-    document
-      .querySelectorAll(".nav-dropdown.open")
-      .forEach((x) => x.classList.remove("open"));
-  });
 }
 
 // ===== Hash Search Handler =====
@@ -577,9 +555,16 @@ function syncLoginStatusUI() {
 window.addEventListener("adminLoginStatusChanged", syncLoginStatusUI);
 
 // ===== INITIALIZE ALL SYSTEMS =====
-// ===== INITIALIZE ALL SYSTEMS =====
 document.addEventListener("DOMContentLoaded", () => {
-  setupNavDropdown();
+  // INITIALIZE UNIFIED DROPDOWN MANAGER FIRST
+  if (typeof UnifiedDropdownManager !== "undefined") {
+    if (!window.unifiedDropdownManager) {
+      window.unifiedDropdownManager = new UnifiedDropdownManager();
+    }
+  } else {
+    console.warn("⚠️ UnifiedDropdownManager not loaded. Include dropdown-manager.js first!");
+  }
+
   setupHashSearch();
 
   if (typeof LoginManager !== "undefined") {

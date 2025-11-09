@@ -20,7 +20,6 @@
           <a href="#"
             ><img src="./assets/main_logo.png" alt="Logo"
           /></a>
-          <!-- <span class="logo-text">KSM EDUCATION</span> -->
         </div>
         <nav>
           <a href="#" class="active">HOME</a>
@@ -129,10 +128,17 @@
       </section>
     </div>
 
+    <!-- ===== SCRIPT LOADING ORDER IS CRITICAL ===== -->
+    <!-- 1. Load shared systems first (navbar, dropdown, etc) -->
+    <script src="./js/script.js"></script>
+    
+    <!-- 2. Load dependencies -->
     <script src="./js/statistic.js"></script>
     <script src="./js/jurnal.js"></script>
     <script src="./js/opinions_manager.js"></script>
     <script src="./js/file_upload.js"></script>
+    
+    <!-- 3. Load user-specific last -->
     <script src="./js/dashboard_user.js"></script>
     <script src="./js/mobile_menu.js"></script>
   </body>
