@@ -1,4 +1,4 @@
-// ===== EXPLORE JURNAL USER - COMPLETE FIX =====
+// ===== EXPLORE JURNAL USER - WITH PDF TEXT EXTRACTION =====
 
 console.log("🚀 Starting explore_jurnal_user.js");
 
@@ -7,6 +7,15 @@ if (typeof feather !== 'undefined') {
   feather.replace();
 } else {
   console.warn("⚠️ Feather icons not loaded");
+}
+
+// Initialize PDF Extractor
+let pdfExtractor = null;
+if (typeof PDFTextExtractor !== 'undefined') {
+  pdfExtractor = new PDFTextExtractor();
+  console.log('✅ PDF Extractor ready');
+} else {
+  console.warn('⚠️ PDF Extractor not available - text extraction disabled');
 }
 
 // ===== SETUP NAV DROPDOWN =====
@@ -156,10 +165,9 @@ const articleType = urlParams.get('type') || 'jurnal';
 console.log('📋 URL Parameters:', { articleId, articleType, fullURL: window.location.href });
 
 // ===== MAIN LOAD FUNCTION =====
-function loadArticleDetail() {
+async function loadArticleDetail() {
   console.log('🔍 Starting loadArticleDetail...');
   
-  // Check if we have an article ID
   if (!articleId) {
     console.error('❌ No article ID in URL');
     showError('No article ID provided');
@@ -167,11 +175,9 @@ function loadArticleDetail() {
   }
 
   try {
-    // Determine storage key
     const storageKey = articleType === 'opini' ? 'opinions' : 'journals';
     console.log('📦 Storage key:', storageKey);
     
-    // Get all articles
     const articlesJSON = localStorage.getItem(storageKey);
     console.log('📚 Raw localStorage data:', articlesJSON);
     
@@ -179,26 +185,22 @@ function loadArticleDetail() {
     console.log('📚 Parsed articles array:', articles);
     console.log('📊 Total articles found:', articles.length);
     
-    // Try different matching strategies
     let article = null;
     
-    // Strategy 1: Exact match
+    // Try different matching strategies
     article = articles.find(a => a.id === articleId);
     console.log('🔍 Strategy 1 (exact match):', article);
     
-    // Strategy 2: String comparison
     if (!article) {
       article = articles.find(a => String(a.id) === String(articleId));
       console.log('🔍 Strategy 2 (string match):', article);
     }
     
-    // Strategy 3: Case-insensitive
     if (!article) {
       article = articles.find(a => String(a.id).toLowerCase() === String(articleId).toLowerCase());
       console.log('🔍 Strategy 3 (case-insensitive):', article);
     }
     
-    // Strategy 4: Numeric match
     if (!article && !isNaN(articleId)) {
       article = articles.find(a => Number(a.id) === Number(articleId));
       console.log('🔍 Strategy 4 (numeric match):', article);
@@ -212,7 +214,7 @@ function loadArticleDetail() {
     }
 
     console.log('✅ Article found:', article);
-    displayArticle(article, articleType);
+    await displayArticle(article, articleType);
     updateViewCount(articleId, storageKey);
     
   } catch (error) {
@@ -221,7 +223,7 @@ function loadArticleDetail() {
   }
 }
 
-function displayArticle(article, type) {
+async function displayArticle(article, type) {
   console.log('🎨 Displaying article...', article);
   
   const loadingState = document.getElementById('loadingState');
@@ -280,7 +282,7 @@ function displayArticle(article, type) {
   // Read time
   const readTimeEl = document.getElementById('readTime');
   if (readTimeEl) {
-    const abstract = article.abstract || article.abstrak || '';
+    const abstract = article.fullAbstract || article.abstract || article.abstrak || '';
     const content = article.content || article.body || '';
     const wordCount = (abstract + ' ' + content).split(' ').length;
     const readTime = Math.max(2, Math.ceil(wordCount / 200));
@@ -301,14 +303,15 @@ function displayArticle(article, type) {
   // Abstract
   const abstractEl = document.getElementById('articleAbstract');
   if (abstractEl) {
-    abstractEl.textContent = article.abstract || article.abstrak || 'Tidak ada abstrak tersedia';
+    abstractEl.textContent = article.fullAbstract || article.abstract || article.abstrak || 'Tidak ada abstrak tersedia';
   }
 
-  // Article Body/Content
+  // Article Body/Content - EXTRACT FROM PDF IF AVAILABLE
   const bodySection = document.getElementById('articleBodySection');
   const bodyElement = document.getElementById('articleBody');
   
   if (bodySection && bodyElement) {
+    // Check if we have existing content
     if (article.content || article.body) {
       bodySection.style.display = 'block';
       const bodyContent = article.content || article.body;
@@ -318,7 +321,17 @@ function displayArticle(article, type) {
       } else {
         bodyElement.innerHTML = `<p>${bodyContent.replace(/\n/g, '</p><p>')}</p>`;
       }
-    } else {
+    } 
+    // Try to extract from PDF
+    else if (pdfExtractor && (article.fileData || article.file || article.pdfUrl)) {
+      bodySection.style.display = 'block';
+      const pdfUrl = article.fileData || article.file || article.pdfUrl;
+      
+      console.log('📄 Attempting to extract PDF content...');
+      await pdfExtractor.renderPDFContent(pdfUrl, bodyElement);
+    } 
+    // No content available
+    else {
       bodySection.style.display = 'none';
     }
   }
@@ -394,7 +407,7 @@ function displayArticle(article, type) {
   // PDF Section
   const pdfSection = document.getElementById('pdfSection');
   if (pdfSection) {
-    const pdfUrl = article.file || article.pdfUrl;
+    const pdfUrl = article.fileData || article.file || article.pdfUrl;
     
     if (pdfUrl) {
       pdfSection.style.display = 'block';
@@ -428,7 +441,6 @@ function showError(message) {
   if (errorState) {
     errorState.style.display = 'flex';
     
-    // Add debug info to error message
     const errorDebug = errorState.querySelector('p');
     if (errorDebug) {
       errorDebug.innerHTML = `

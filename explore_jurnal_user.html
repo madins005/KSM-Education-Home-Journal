@@ -11,6 +11,9 @@
     <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
     <link rel="stylesheet" href="./styles/explore_jurnal_user.css" />
     <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- PDF.js Library for PDF Text Extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   </head>
   <body>
     <!-- Header -->
@@ -115,14 +118,14 @@
             </div>
           </div>
 
-          <!-- Main Article Body -->
+          <!-- Main Article Body (Extracted from PDF) -->
           <div class="content-section" id="articleBodySection">
             <h3>
               <i data-feather="align-left"></i>
               Isi Artikel
             </h3>
             <div class="article-body" id="articleBody">
-              <!-- Dynamic content will be inserted here -->
+              <!-- PDF text will be extracted and displayed here -->
             </div>
           </div>
 
@@ -204,6 +207,8 @@
       </div>
     </div>
 
+    <!-- CRITICAL: Load PDF Extractor BEFORE main script -->
+    <script src="./js/pdf_text_extractor.js"></script>
     <script src="./js/explore_jurnal_user.js"></script>
   </body>
 </html>
