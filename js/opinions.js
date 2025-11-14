@@ -306,9 +306,9 @@ class OpinionsPageManager {
   function initOpinionsPage() {
     if (document.getElementById("opinionsContainer")) {
       window.opinionsPageManager = new OpinionsPageManager();
-      console.log("✅ OpinionsPageManager initialized on opinions.html");
+      console.log("OpinionsPageManager initialized on opinions.html");
     }
   }
 })();
 
-console.log("✅ opinions.js loaded");
+console.log("opinions.js loaded");

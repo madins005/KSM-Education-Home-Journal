@@ -218,5 +218,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  console.log('✅ Responsive menu initialized successfully');
+  console.log('Responsive menu initialized successfully');
 });

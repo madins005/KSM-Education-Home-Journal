@@ -16,7 +16,7 @@ class UploadTabsManager {
       });
     });
 
-    console.log("✅ Upload Tabs initialized");
+    console.log("Upload Tabs initialized");
   }
 
   switchTab(targetTab) {
@@ -46,4 +46,4 @@ class UploadTabsManager {
   }
 }
 
-console.log("✅ upload_tabs.js loaded");
+console.log("upload_tabs.js loaded");

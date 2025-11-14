@@ -174,7 +174,7 @@ class StatisticsManager {
       this.currentArticles = journalsCount + opinionsCount;
 
       console.log(
-        `📊 Article count: ${journalsCount} journals + ${opinionsCount} opinions = ${this.currentArticles} total`
+        `Article count: ${journalsCount} journals + ${opinionsCount} opinions = ${this.currentArticles} total`
       );
     } catch {
       this.currentArticles = 0;

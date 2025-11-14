@@ -1,21 +1,21 @@
 // ===== EXPLORE JURNAL USER - WITH PDF TEXT EXTRACTION =====
 
-console.log("🚀 Starting explore_jurnal_user.js");
+console.log("Starting explore_jurnal_user.js");
 
 // Initialize Feather Icons
 if (typeof feather !== 'undefined') {
   feather.replace();
 } else {
-  console.warn("⚠️ Feather icons not loaded");
+  console.warn("Feather icons not loaded");
 }
 
 // Initialize PDF Extractor
 let pdfExtractor = null;
 if (typeof PDFTextExtractor !== 'undefined') {
   pdfExtractor = new PDFTextExtractor();
-  console.log('✅ PDF Extractor ready');
+  console.log('PDF Extractor ready');
 } else {
-  console.warn('⚠️ PDF Extractor not available - text extraction disabled');
+  console.warn('PDF Extractor not available - text extraction disabled');
 }
 
 // ===== SETUP NAV DROPDOWN =====
@@ -162,69 +162,69 @@ const urlParams = new URLSearchParams(window.location.search);
 const articleId = urlParams.get('id');
 const articleType = urlParams.get('type') || 'jurnal';
 
-console.log('📋 URL Parameters:', { articleId, articleType, fullURL: window.location.href });
+console.log('URL Parameters:', { articleId, articleType, fullURL: window.location.href });
 
 // ===== MAIN LOAD FUNCTION =====
 async function loadArticleDetail() {
-  console.log('🔍 Starting loadArticleDetail...');
+  console.log('Starting loadArticleDetail...');
   
   if (!articleId) {
-    console.error('❌ No article ID in URL');
+    console.error('No article ID in URL');
     showError('No article ID provided');
     return;
   }
 
   try {
     const storageKey = articleType === 'opini' ? 'opinions' : 'journals';
-    console.log('📦 Storage key:', storageKey);
+    console.log('Storage key:', storageKey);
     
     const articlesJSON = localStorage.getItem(storageKey);
-    console.log('📚 Raw localStorage data:', articlesJSON);
+    console.log('Raw localStorage data:', articlesJSON);
     
     const articles = JSON.parse(articlesJSON || '[]');
-    console.log('📚 Parsed articles array:', articles);
-    console.log('📊 Total articles found:', articles.length);
+    console.log('Parsed articles array:', articles);
+    console.log('Total articles found:', articles.length);
     
     let article = null;
     
     // Try different matching strategies
     article = articles.find(a => a.id === articleId);
-    console.log('🔍 Strategy 1 (exact match):', article);
+    console.log('Strategy 1 (exact match):', article);
     
     if (!article) {
       article = articles.find(a => String(a.id) === String(articleId));
-      console.log('🔍 Strategy 2 (string match):', article);
+      console.log('Strategy 2 (string match):', article);
     }
     
     if (!article) {
       article = articles.find(a => String(a.id).toLowerCase() === String(articleId).toLowerCase());
-      console.log('🔍 Strategy 3 (case-insensitive):', article);
+      console.log('Strategy 3 (case-insensitive):', article);
     }
     
     if (!article && !isNaN(articleId)) {
       article = articles.find(a => Number(a.id) === Number(articleId));
-      console.log('🔍 Strategy 4 (numeric match):', article);
+      console.log('Strategy 4 (numeric match):', article);
     }
 
     if (!article) {
-      console.error('❌ Article not found after all strategies');
+      console.error('Article not found after all strategies');
       console.log('Available article IDs:', articles.map(a => ({id: a.id, type: typeof a.id})));
       showError('Article not found in database');
       return;
     }
 
-    console.log('✅ Article found:', article);
+    console.log('Article found:', article);
     await displayArticle(article, articleType);
     updateViewCount(articleId, storageKey);
     
   } catch (error) {
-    console.error('❌ Error in loadArticleDetail:', error);
+    console.error('Error in loadArticleDetail:', error);
     showError(error.message);
   }
 }
 
 async function displayArticle(article, type) {
-  console.log('🎨 Displaying article...', article);
+  console.log('Displaying article...', article);
   
   const loadingState = document.getElementById('loadingState');
   const articleDetail = document.getElementById('articleDetail');
@@ -295,7 +295,7 @@ async function displayArticle(article, type) {
     coverImg.src = article.cover || article.coverImage;
     coverImg.style.display = 'block';
     coverImg.onerror = function() {
-      console.warn('⚠️ Cover image failed to load');
+      console.warn('Cover image failed to load');
       this.style.display = 'none';
     };
   }
@@ -327,7 +327,7 @@ async function displayArticle(article, type) {
       bodySection.style.display = 'block';
       const pdfUrl = article.fileData || article.file || article.pdfUrl;
       
-      console.log('📄 Attempting to extract PDF content...');
+      console.log('Attempting to extract PDF content...');
       await pdfExtractor.renderPDFContent(pdfUrl, bodyElement);
     } 
     // No content available
@@ -428,11 +428,11 @@ async function displayArticle(article, type) {
   // Replace feather icons
   if (typeof feather !== 'undefined') feather.replace();
   
-  console.log('✅ Article displayed successfully');
+  console.log('Article displayed successfully');
 }
 
 function showError(message) {
-  console.error('💥 Showing error:', message);
+  console.error('Showing error:', message);
   
   const loadingState = document.getElementById('loadingState');
   const errorState = document.getElementById('errorState');
@@ -464,10 +464,10 @@ function updateViewCount(articleId, storageKey) {
     if (articleIndex !== -1) {
       articles[articleIndex].views = (articles[articleIndex].views || 0) + 1;
       localStorage.setItem(storageKey, JSON.stringify(articles));
-      console.log('👁️ View count updated:', articles[articleIndex].views);
+      console.log('View count updated:', articles[articleIndex].views);
     }
   } catch (error) {
-    console.error('❌ Error updating view count:', error);
+    console.error('Error updating view count:', error);
   }
 }
 
@@ -493,11 +493,11 @@ if (togglePdfBtn) {
 
 // ===== INITIALIZE =====
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('📖 DOM Content Loaded - Initializing...');
+  console.log('DOM Content Loaded - Initializing...');
   setupNavDropdown();
   loadArticleDetail();
   if (typeof feather !== 'undefined') feather.replace();
-  console.log('✅ Initialization complete');
+  console.log('Initialization complete');
 });
 
-console.log('✅ explore_jurnal_user.js loaded');
+console.log('explore_jurnal_user.js loaded');

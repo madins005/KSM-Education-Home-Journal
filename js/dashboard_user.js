@@ -268,7 +268,7 @@ function performSearch(query) {
 
 // ===== INITIALIZE USER DASHBOARD =====
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🏠 Initializing User Dashboard...");
+  console.log("Initializing User Dashboard...");
 
   syncVisitorCount();
 
@@ -285,5 +285,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   feather.replace();
 
-  console.log("✅ User Dashboard ready");
+  console.log("User Dashboard ready");
 });

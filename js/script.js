@@ -562,7 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.unifiedDropdownManager = new UnifiedDropdownManager();
     }
   } else {
-    console.warn("⚠️ UnifiedDropdownManager not loaded. Include dropdown-manager.js first!");
+    console.warn("UnifiedDropdownManager not loaded. Include dropdown-manager.js first!");
   }
 
   setupHashSearch();
@@ -625,5 +625,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // SYNC LOGIN STATUS UNTUK RENDER TOMBOL DI ADMIN
   syncLoginStatusUI();
 
-  console.log("✅ All systems initialized successfully");
+  console.log("All systems initialized successfully");
 });
